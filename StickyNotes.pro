@@ -24,15 +24,24 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
+    editbar.cpp \
     main.cpp \
     mainwindow.cpp \
     styleoptionbar.cpp \
-    titlebar.cpp
+    titlebar.cpp \
+    textedit.cpp \
+    vscrollbar.cpp \
+    imagelib.cpp \
 
 HEADERS += \
+    editbar.h \
     mainwindow.h \
     styleoptionbar.h \
-    titlebar.h
+    titlebar.h \
+    textedit.h \
+    vscrollbar.h \
+    imagelib.h \
+    filedialog.h \
 
 RESOURCES += \
     assets.qrc

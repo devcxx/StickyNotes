@@ -1,14 +1,15 @@
 #include "styleoptionbar.h"
 
-StyleOptionBar::StyleOptionBar(QWidget *parent) : QWidget(parent)
+StyleOptionBar::StyleOptionBar(QWidget* parent)
+    : QWidget(parent)
 {
     this->setFixedHeight(28);
-    purpleStyle_btn=new QPushButton(this);
-    yellowStyle_btn=new QPushButton(this);
-    blueStyle_btn=new QPushButton(this);
-    greenStyle_btn=new QPushButton(this);
-    pinkStyle_btn=new QPushButton(this);
-    whiteStyle_btn=new QPushButton(this);
+    purpleStyle_btn = new QPushButton(this);
+    yellowStyle_btn = new QPushButton(this);
+    blueStyle_btn = new QPushButton(this);
+    greenStyle_btn = new QPushButton(this);
+    pinkStyle_btn = new QPushButton(this);
+    whiteStyle_btn = new QPushButton(this);
 
     purpleStyle_btn->setObjectName("background: rgb(225,215,237);");
     yellowStyle_btn->setObjectName("background: rgb(255,242,181);");
@@ -30,15 +31,15 @@ StyleOptionBar::StyleOptionBar(QWidget *parent) : QWidget(parent)
     whiteStyle_btn->setStyleSheet("QPushButton{background: rgb(243,243,243);width:30px;height:20px;border:none;}"
                                   "QPushButton:hover:pressed:{none}");
 
-    connect(purpleStyle_btn,SIGNAL(clicked(bool)),this,SLOT(onStyleBtnClicked()));
-    connect(yellowStyle_btn,SIGNAL(clicked(bool)),this,SLOT(onStyleBtnClicked()));
-    connect(blueStyle_btn,SIGNAL(clicked(bool)),this,SLOT(onStyleBtnClicked()));
-    connect(greenStyle_btn,SIGNAL(clicked(bool)),this,SLOT(onStyleBtnClicked()));
-    connect(pinkStyle_btn,SIGNAL(clicked(bool)),this,SLOT(onStyleBtnClicked()));
-    connect(whiteStyle_btn,SIGNAL(clicked(bool)),this,SLOT(onStyleBtnClicked()));
+    connect(purpleStyle_btn, SIGNAL(clicked(bool)), this, SLOT(onStyleBtnClicked()));
+    connect(yellowStyle_btn, SIGNAL(clicked(bool)), this, SLOT(onStyleBtnClicked()));
+    connect(blueStyle_btn, SIGNAL(clicked(bool)), this, SLOT(onStyleBtnClicked()));
+    connect(greenStyle_btn, SIGNAL(clicked(bool)), this, SLOT(onStyleBtnClicked()));
+    connect(pinkStyle_btn, SIGNAL(clicked(bool)), this, SLOT(onStyleBtnClicked()));
+    connect(whiteStyle_btn, SIGNAL(clicked(bool)), this, SLOT(onStyleBtnClicked()));
 
-    styleOptions=new QHBoxLayout(this);
-    styleOptions->setContentsMargins(0,6,0,0);
+    styleOptions = new QHBoxLayout(this);
+    styleOptions->setContentsMargins(0, 6, 0, 0);
     styleOptions->addStretch();
     styleOptions->addWidget(purpleStyle_btn);
     styleOptions->addWidget(yellowStyle_btn);
@@ -49,7 +50,8 @@ StyleOptionBar::StyleOptionBar(QWidget *parent) : QWidget(parent)
     styleOptions->addStretch();
 }
 
-StyleOptionBar::~StyleOptionBar(){
+StyleOptionBar::~StyleOptionBar()
+{
     delete purpleStyle_btn;
     delete yellowStyle_btn;
     delete blueStyle_btn;
@@ -59,6 +61,7 @@ StyleOptionBar::~StyleOptionBar(){
     delete styleOptions;
 }
 
-void StyleOptionBar::onStyleBtnClicked(){
+void StyleOptionBar::onStyleBtnClicked()
+{
     emit styleBtnClickedSignal(QObject::sender()->objectName());
 }

@@ -1,20 +1,20 @@
 #ifndef TITLEBAR_H
 #define TITLEBAR_H
 
-#include <QWidget>
+#include <QHBoxLayout>
+#include <QMouseEvent>
+#include <QPoint>
 #include <QPushButton>
 #include <QTextEdit>
-#include <QPoint>
-#include <QMouseEvent>
-#include <QHBoxLayout>
+#include <QWidget>
 
 #define BTN_WIDTH 24
 #define TITLEBAR_HEIGHT 28
 
-class TitleBar : public QWidget{
+class TitleBar : public QWidget {
     Q_OBJECT
 public:
-    explicit TitleBar(QWidget *parent = nullptr);
+    explicit TitleBar(QWidget* parent = nullptr);
     ~TitleBar();
     void setBtnsVisible(bool);
 
@@ -31,11 +31,11 @@ private slots:
     void onCloseBtnClicked();
 
 private:
-    QPushButton *new_btn;
-    QPushButton *setting_btn;
-    QPushButton *delete_btn;
-    QPushButton *close_btn;
-    QHBoxLayout *titlebar_layout;
+    QPushButton* new_btn;
+    QPushButton* setting_btn;
+    QPushButton* delete_btn;
+    QPushButton* close_btn;
+    QHBoxLayout* titlebar_layout;
 
     bool m_bPressed;
     QPoint m_point;
@@ -44,9 +44,9 @@ private:
     void initConnection();
 
 protected:
-    virtual void mouseMoveEvent(QMouseEvent *event) override;
-    virtual void mousePressEvent(QMouseEvent *event) override;
-    virtual void mouseReleaseEvent(QMouseEvent *event) override;
+    virtual void mouseMoveEvent(QMouseEvent* event) override;
+    virtual void mousePressEvent(QMouseEvent* event) override;
+    virtual void mouseReleaseEvent(QMouseEvent* event) override;
 };
 
 #endif // TITLEBAR_H
