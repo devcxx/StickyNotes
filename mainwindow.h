@@ -1,63 +1,64 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QFocusEvent>
-#include <QHBoxLayout>
+#include "dbmanager.h"
+#include "notemodel.h"
+#include "noteview.h"
+#include "stickywindow.h"
+#include <QHash>
 #include <QMainWindow>
-#include <QStatusBar>
-#include <QString>
-#include <QTextEdit>
-#include <QVBoxLayout>
-
-#include "editbar.h"
-#include "styleoptionbar.h"
-#include "textedit.h"
-#include "titlebar.h"
+#include <QPushButton>
+#include <QSettings>
+#include <QSortFilterProxyModel>
+#include <QThread>
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
-
 public:
-    explicit MainWindow(QWidget* parent = 0);
-    ~MainWindow();
-
-    QString getContentText();
-    void setContentTest(QString);
+    explicit MainWindow(QWidget* parent = Q_NULLPTR);
 
 private:
-    TitleBar* titlebar;
-    EditBar* editbar;
-    StyleOptionBar* styleOptionBar;
-    TextEdit* content;
-    QStatusBar* statusBar;
-    QVBoxLayout* content_layout;
-    QWidget* parentW;
-    QString style = "background: rgb(243,243,243);";
-    QString lastImgPath_;
+    void initUI();
+    void setupDatabases();
+    void setupModelView();
+    void setupSignalsSlots();
+    void initializeSettingsDatabase();
+    void restoreStates();
+    NoteData* generateNote(const int noteID);
+    void showSticky(const QModelIndex& noteIndex);
 
-    void initTitlebar();
-    void initEditbar();
-    void setStyle(const QString& style);
-    void mergeFormatOnWordOrSelection(const QTextCharFormat& format);
-    void imageEmbed(const QString& path);
-    QString selectImage();
+private:
+    QPushButton* m_createNewButton;
+    NoteView* m_noteView;
+    NoteModel* m_noteModel;
+    NoteModel* m_deletedNotesModel;
+    QSortFilterProxyModel* m_proxyModel;
+    QModelIndex m_currentSelectedNoteProxy;
+    int m_noteCounter;
+
+    DBManager* m_dbManager;
+    QThread* m_dbThread;
+    QSettings* m_settingsDatabase;
+
+    QHash<int, StickyWindow*> m_stickys;
 
 private slots:
-    void onNewBtnClicked();
-    void onSettingBtnClicked();
-    void onDeleteBtnClicked();
-    void onCloseBtnClicked();
-    void onStyleBtnClicked(QString btnName);
-    void onBoldBtnClicked(bool checked);
-    void onItalicBtnClicked(bool checked);
-    void onUnderlineBtnClicked(bool checked);
-    void onStrikeBtnClicked(bool checked);
-    void onEmbedImageBtnClicked(bool checked);
+    void createNewNote();
+    void InitData();
+    void loadNotes(QList<NoteData*> noteList, int noteCounter);
+    void onNotePressed(const QModelIndex& index);
+    void selectNote(const QModelIndex& noteIndex);
+    void saveNoteToDB(const QModelIndex& noteIndex);
+    void saveNoteToDB(NoteData* noteData);
 
 protected:
-    virtual void closeEvent(QCloseEvent* event) override;
-    virtual void enterEvent(QEvent* event) override;
-    virtual void leaveEvent(QEvent* event) override;
+    void closeEvent(QCloseEvent* event) Q_DECL_OVERRIDE;
+
+signals:
+    void requestNotesList();
+    void requestCreateUpdateNote(NoteData* note);
+    void requestDeleteNote(NoteData* note);
+    void requestOpenDBManager(QString path, bool doCreate);
 };
 
 #endif // MAINWINDOW_H

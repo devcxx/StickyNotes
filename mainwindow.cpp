@@ -1,322 +1,308 @@
 #include "mainwindow.h"
-
-#include "filedialog.h"
-#include <QDebug>
-#include <QFile>
-#include <QFileDialog>
+#include "noteview.h"
+#include "notewidgetdelegate.h"
+#include <QApplication>
+#include <QDesktopWidget>
+#include <QDir>
 #include <QFileInfo>
-#include <QList>
-#include <QWidget>
-#include <QXmlStreamWriter>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QSplitter>
+#include <QTimer>
+#include <QVBoxLayout>
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
+    , m_noteModel(new NoteModel(this))
+    , m_deletedNotesModel(new NoteModel(this))
+    , m_proxyModel(new QSortFilterProxyModel(this))
+    , m_noteCounter(0)
+    , m_dbManager(Q_NULLPTR)
+    , m_dbThread(Q_NULLPTR)
+
 {
-    this->parentW = parent;
-    this->setAttribute(Qt::WA_DeleteOnClose);
-    this->setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
-    this->setCentralWidget(new QWidget());
-
-    initTitlebar();
-    initEditbar();
-    styleOptionBar = new StyleOptionBar(this);
-    content = new TextEdit(this);
-    statusBar = new QStatusBar(this);
-
-    this->setFocusProxy(this->content);
-
-    connect(styleOptionBar, SIGNAL(styleBtnClickedSignal(QString)), this, SLOT(onStyleBtnClicked(QString)));
-    styleOptionBar->setVisible(false);
-
-    content->setFocusPolicy(Qt::StrongFocus);
-    content->setStyleSheet("background-color:transparent;"
-                           "font-size:14px;"
-                           "border:none;"
-                           "font-family:'Microsoft Yahei'");
-
-    statusBar->setFixedHeight(6);
-    statusBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-
-    QVBoxLayout* main_layout = new QVBoxLayout(this);
-    main_layout->addWidget(titlebar);
-    main_layout->addWidget(styleOptionBar);
-
-    content_layout = new QVBoxLayout(this);
-    content_layout->addWidget(content);
-    content_layout->setContentsMargins(12, 0, 12, 4);
-    main_layout->addLayout(content_layout);
-    main_layout->addWidget(editbar);
-    main_layout->addWidget(statusBar);
-
-    main_layout->setContentsMargins(0, 0, 0, 0);
-    centralWidget()->setLayout(main_layout);
+    initUI();
+    setupDatabases();
+    setupModelView();
+    setupSignalsSlots();
+    restoreStates();
+    QTimer::singleShot(200, this, SLOT(InitData()));
 }
 
-MainWindow::~MainWindow()
+void MainWindow::initUI()
 {
-    delete content;
-    delete styleOptionBar;
-    delete titlebar;
+    resize(320, 620);
+    QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
+    sizePolicy.setHorizontalStretch(0);
+    sizePolicy.setVerticalStretch(0);
+    sizePolicy.setHeightForWidth(this->sizePolicy().hasHeightForWidth());
+    setSizePolicy(sizePolicy);
+    setMinimumSize(QSize(320, 500));
+
+    setDocumentMode(false);
+    setTabShape(QTabWidget::Rounded);
+    QWidget* centralWidget = new QWidget(this);
+
+    QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    sizePolicy1.setHorizontalStretch(0);
+    sizePolicy1.setVerticalStretch(0);
+    sizePolicy1.setHeightForWidth(centralWidget->sizePolicy().hasHeightForWidth());
+    centralWidget->setSizePolicy(sizePolicy1);
+
+    QVBoxLayout* verticalLayout_scrollArea = new QVBoxLayout();
+    verticalLayout_scrollArea->setSpacing(0);
+    verticalLayout_scrollArea->setObjectName(QString::fromUtf8("verticalLayout_scrollArea"));
+    verticalLayout_scrollArea->setSizeConstraint(QLayout::SetNoConstraint);
+
+    QSpacerItem* verticalSpacer_upSearchEdit = new QSpacerItem(20, 10, QSizePolicy::Minimum, QSizePolicy::Minimum);
+    verticalLayout_scrollArea->addItem(verticalSpacer_upSearchEdit);
+
+    QHBoxLayout* horizontalLayout_scrollArea_3 = new QHBoxLayout();
+    horizontalLayout_scrollArea_3->setSpacing(0);
+    horizontalLayout_scrollArea_3->setObjectName(QString::fromUtf8("horizontalLayout_scrollArea_3"));
+    horizontalLayout_scrollArea_3->setContentsMargins(0, 0, -1, -1);
+    QSpacerItem* horizontalSpacer_leftSearchEdit = new QSpacerItem(10, 20, QSizePolicy::Minimum, QSizePolicy::Minimum);
+    horizontalLayout_scrollArea_3->addItem(horizontalSpacer_leftSearchEdit);
+
+    QLineEdit* searchEdit = new QLineEdit(this);
+    searchEdit->setObjectName(QString::fromUtf8("searchEdit"));
+    QSizePolicy sizePolicy2(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    sizePolicy2.setHorizontalStretch(0);
+    sizePolicy2.setVerticalStretch(0);
+    sizePolicy2.setHeightForWidth(searchEdit->sizePolicy().hasHeightForWidth());
+    searchEdit->setSizePolicy(sizePolicy2);
+    searchEdit->setMinimumSize(QSize(0, 30));
+    searchEdit->setMaximumSize(QSize(16777215, 22));
+    QFont font;
+    font.setFamily(QString::fromUtf8("Arial"));
+    font.setPointSize(10);
+    font.setItalic(false);
+    searchEdit->setFont(font);
+    searchEdit->setFocusPolicy(Qt::StrongFocus);
+    searchEdit->setAutoFillBackground(false);
+    searchEdit->setStyleSheet(QString::fromUtf8(""));
+    searchEdit->setFrame(true);
+    searchEdit->setCursorMoveStyle(Qt::LogicalMoveStyle);
+    searchEdit->setClearButtonEnabled(false);
+
+    horizontalLayout_scrollArea_3->addWidget(searchEdit);
+
+    m_createNewButton = new QPushButton(this);
+    m_createNewButton->setText(tr("Add"));
+    horizontalLayout_scrollArea_3->addWidget(m_createNewButton);
+
+    QSpacerItem* horizontalSpacer_rightSearchEdit = new QSpacerItem(10, 20, QSizePolicy::Minimum, QSizePolicy::Minimum);
+    horizontalLayout_scrollArea_3->addItem(horizontalSpacer_rightSearchEdit);
+    verticalLayout_scrollArea->addLayout(horizontalLayout_scrollArea_3);
+    QSpacerItem* verticalSpacer_upScrollArea = new QSpacerItem(20, 20, QSizePolicy::Minimum, QSizePolicy::Minimum);
+
+    verticalLayout_scrollArea->addItem(verticalSpacer_upScrollArea);
+
+    NoteView* listView = new NoteView(this);
+    listView->setObjectName(QString::fromUtf8("listView"));
+    QSizePolicy sizePolicy3(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    sizePolicy3.setHorizontalStretch(0);
+    sizePolicy3.setVerticalStretch(0);
+    sizePolicy3.setHeightForWidth(listView->sizePolicy().hasHeightForWidth());
+    listView->setSizePolicy(sizePolicy3);
+    listView->setMinimumSize(QSize(0, 0));
+    listView->setBaseSize(QSize(20, 0));
+    listView->setFrameShape(QFrame::NoFrame);
+    listView->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    listView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    listView->setProperty("showDropIndicator", QVariant(false));
+    listView->setSelectionBehavior(QAbstractItemView::SelectRows);
+
+    m_noteView = listView;
+
+    verticalLayout_scrollArea->addWidget(listView);
+
+    centralWidget->setLayout(verticalLayout_scrollArea);
+    setCentralWidget(centralWidget);
 }
 
-QString MainWindow::getContentText()
+void MainWindow::setupDatabases()
 {
-    return content->toPlainText();
-}
+    m_settingsDatabase = new QSettings(QSettings::IniFormat, QSettings::UserScope,
+        QStringLiteral("StickyNotes"), QStringLiteral("Settings"), this);
+    m_settingsDatabase->setFallbacksEnabled(false);
+    initializeSettingsDatabase();
 
-void MainWindow::setContentTest(QString text)
-{
-    this->content->append(text);
-}
+    bool doCreate = false;
+    QFileInfo fi(m_settingsDatabase->fileName());
+    QDir dir(fi.absolutePath());
+    bool folderCreated = dir.mkpath(QStringLiteral("."));
+    if (!folderCreated)
+        qFatal("ERROR: Can't create settings folder : %s", dir.absolutePath().toStdString().c_str());
 
-void MainWindow::initTitlebar()
-{
-    titlebar = new TitleBar(this);
-    titlebar->setBtnsVisible(false);
-    connect(titlebar, SIGNAL(newBtnClickedSignal()), this, SLOT(onNewBtnClicked()));
-    connect(titlebar, SIGNAL(settingBtnClickedSignal()), this, SLOT(onSettingBtnClicked()));
-    connect(titlebar, SIGNAL(deleteBtnClickedSignal()), this, SLOT(onDeleteBtnClicked()));
-    connect(titlebar, SIGNAL(closeBtnClickedSignal()), this, SLOT(onCloseBtnClicked()));
-}
+    QString noteDBFilePath(dir.path() + QDir::separator() + QStringLiteral("notes.db"));
 
-void MainWindow::initEditbar()
-{
-    editbar = new EditBar(this);
-    connect(editbar, SIGNAL(boldBtnClickedSignal(bool)), this, SLOT(onBoldBtnClicked(bool)));
-    connect(editbar, SIGNAL(italicBtnClickedSignal(bool)), this, SLOT(onItalicBtnClicked(bool)));
-    connect(editbar, SIGNAL(underlineBtnClickedSignal(bool)), this, SLOT(onUnderlineBtnClicked(bool)));
-    connect(editbar, SIGNAL(strikeBtnClickedSignal(bool)), this, SLOT(onStrikeBtnClicked(bool)));
-    connect(editbar, SIGNAL(embedImageBtnClickedSignal(bool)), this, SLOT(onEmbedImageBtnClicked(bool)));
-}
+    if (!QFile::exists(noteDBFilePath)) {
+        QFile noteDBFile(noteDBFilePath);
+        if (!noteDBFile.open(QIODevice::WriteOnly))
+            qFatal("ERROR : Can't create database file");
 
-void MainWindow::onNewBtnClicked()
-{
-    MainWindow* newWindow = new MainWindow(this->parentW);
-    newWindow->setGeometry(this->pos().x() + 20,
-        this->pos().y() + 20,
-        this->size().width(),
-        this->size().height());
-    newWindow->setStyleSheet(this->style);
-    newWindow->show();
-    newWindow->setFocus();
-}
-
-void MainWindow::onSettingBtnClicked()
-{
-    this->styleOptionBar->setVisible(!styleOptionBar->isVisible());
-    this->titlebar->setVisible(false);
-    this->editbar->setVisible(false);
-    this->styleOptionBar->setFocus();
-    //this->content_layout->setContentsMargins(12,0,12,4);
-}
-
-void MainWindow::onDeleteBtnClicked()
-{
-    this->hide();
-    bool isAllDeleted = true;
-    QList<MainWindow*> windows = this->parentWidget()->findChildren<MainWindow*>();
-    if (!windows.isEmpty()) {
-        foreach (MainWindow* mainwindow, windows) {
-            if (mainwindow->isVisible()) {
-                isAllDeleted = false;
-                break;
-            }
-        }
-    }
-    if (isAllDeleted)
-        this->onCloseBtnClicked();
-}
-
-void MainWindow::onCloseBtnClicked()
-{
-    this->close();
-}
-
-void MainWindow::onStyleBtnClicked(QString btnName)
-{
-    this->style = btnName;
-    this->setStyleSheet(btnName);
-    this->styleOptionBar->setVisible(false);
-    this->editbar->setVisible(true);
-    this->titlebar->setVisible(true);
-    this->content->setFocus();
-}
-
-void MainWindow::mergeFormatOnWordOrSelection(const QTextCharFormat& format)
-{
-    QTextCursor cur = content->textCursor();
-    if (!cur.hasSelection()) { // apply to the word only if the cusor isn't at its end
-        QTextCursor tmp = cur;
-        tmp.movePosition(QTextCursor::EndOfWord);
-        if (tmp.position() > cur.position())
-            cur.select(QTextCursor::WordUnderCursor);
-    }
-    if (!cur.hasSelection())
-        content->mergeCurrentCharFormat(format); // alows to type with the new format
-    else
-        cur.mergeCharFormat(format);
-    /* correct the pressed states of the format buttons if necessary */
-    //    formatChanged (content->currentCharFormat());
-}
-
-void MainWindow::imageEmbed(const QString& path)
-{
-    if (path.isEmpty())
-        return;
-
-    QFile file(path);
-    if (!file.open(QIODevice::ReadOnly))
-        return;
-    /* read the data serialized from the file */
-    QDataStream in(&file);
-    QByteArray rawarray;
-    QDataStream datastream(&rawarray, QIODevice::WriteOnly);
-    char a;
-    /* copy between the two data streams */
-    while (in.readRawData(&a, 1) != 0)
-        datastream.writeRawData(&a, 1);
-    file.close();
-    QByteArray base64array = rawarray.toBase64();
-
-    QImage img = QImage(path);
-    QSize imgSize = img.size();
-    int w, h;
-    //    if (QObject::sender() == ui->embedImageButton) {
-    //        w = imgSize.width() * imgScale_ / 100;
-    //        h = imgSize.height() * imgScale_ / 100;
-    //    } else {
-    w = imgSize.width();
-    h = imgSize.height();
-    //    }
-    //    TextEdit *textEdit = qobject_cast<TextEdit*>(ui->stackedWidget->currentWidget());
-    //QString ("<img src=\"data:image/png;base64,%1\">")
-    content->insertHtml(QString("<img src=\"data:image;base64,%1\" width=\"%2\" height=\"%3\" />")
-                            .arg(QString(base64array))
-                            .arg(w)
-                            .arg(h));
-
-    raise();
-}
-
-QString MainWindow::selectImage()
-{
-    QString path;
-    if (!lastImgPath_.isEmpty()) {
-        if (QFile::exists(lastImgPath_))
-            path = lastImgPath_;
-        else {
-            QDir dir = QFileInfo(lastImgPath_).absoluteDir();
-            if (!dir.exists())
-                dir = QDir::home();
-            path = dir.path();
-        }
-    } else
-        path = QDir::home().path();
-
-    QString imagePath;
-    FileDialog dialog(this);
-    dialog.setAcceptMode(QFileDialog::AcceptOpen);
-    dialog.setWindowTitle(tr("Open Image..."));
-    dialog.setFileMode(QFileDialog::ExistingFiles);
-    dialog.setNameFilter(tr("Image Files (*.svg *.png *.jpg *.jpeg *.bmp *.gif);;All Files (*)"));
-    if (QFileInfo(path).isDir())
-        dialog.setDirectory(path);
-    else {
-        dialog.setDirectory(path.section("/", 0, -2)); // workaround for KDE
-        dialog.selectFile(path);
-        dialog.autoScroll();
-    }
-    if (dialog.exec()) {
-        QStringList files = dialog.selectedFiles();
-        if (files.count() > 0)
-            imagePath = files.at(0);
+        noteDBFile.close();
+        doCreate = true;
     }
 
-    return imagePath;
-
-    //    if (!imagePath.isEmpty())
-    //        ImagePathEntry_->setText(imagePath);
+    m_dbManager = new DBManager;
+    m_dbThread = new QThread;
+    m_dbThread->setObjectName(QStringLiteral("dbThread"));
+    m_dbManager->moveToThread(m_dbThread);
+    connect(m_dbThread, &QThread::started, [=]() { emit requestOpenDBManager(noteDBFilePath, doCreate); });
+    connect(this, &MainWindow::requestOpenDBManager, m_dbManager, &DBManager::onOpenDBManagerRequested);
+    connect(m_dbThread, &QThread::finished, m_dbManager, &QObject::deleteLater);
+    m_dbThread->start();
 }
 
-void MainWindow::onBoldBtnClicked(bool checked)
+void MainWindow::setupModelView()
 {
-    QTextCharFormat fmt;
-    fmt.setFontWeight(checked ? QFont::Bold : QFont::Normal);
-    mergeFormatOnWordOrSelection(fmt);
+    m_proxyModel->setSourceModel(m_noteModel);
+    m_proxyModel->setFilterKeyColumn(0);
+    m_proxyModel->setFilterRole(NoteModel::NoteContent);
+    m_proxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
+
+    m_noteView->setItemDelegate(new NoteWidgetDelegate(m_noteView));
+    m_noteView->setModel(m_proxyModel);
 }
 
-void MainWindow::onItalicBtnClicked(bool checked)
+void MainWindow::setupSignalsSlots()
 {
-    QTextCharFormat fmt;
-    fmt.setFontItalic(checked);
-    mergeFormatOnWordOrSelection(fmt);
+    connect(m_createNewButton, &QPushButton::pressed, this, &MainWindow::createNewNote);
+    connect(this, &MainWindow::requestNotesList,
+        m_dbManager, &DBManager::onNotesListRequested, Qt::BlockingQueuedConnection);
+    connect(this, &MainWindow::requestCreateUpdateNote,
+        m_dbManager, &DBManager::onCreateUpdateRequested, Qt::BlockingQueuedConnection);
+    connect(this, &MainWindow::requestDeleteNote,
+        m_dbManager, &DBManager::onDeleteNoteRequested);
+    connect(m_dbManager, &DBManager::notesReceived, this, &MainWindow::loadNotes);
+    connect(m_noteView, &NoteView::pressed, this, &MainWindow::onNotePressed);
 }
 
-void MainWindow::onUnderlineBtnClicked(bool checked)
+void MainWindow::initializeSettingsDatabase()
 {
-    QTextCharFormat fmt;
-    fmt.setFontUnderline(checked);
-    mergeFormatOnWordOrSelection(fmt);
-}
-
-void MainWindow::onStrikeBtnClicked(bool checked)
-{
-    QTextCharFormat fmt;
-    fmt.setFontStrikeOut(checked);
-    mergeFormatOnWordOrSelection(fmt);
-}
-
-void MainWindow::onEmbedImageBtnClicked(bool checked)
-{
-    QString imagePath = selectImage();
-    if (!imagePath.isEmpty()) {
-        lastImgPath_ = imagePath;
-        imageEmbed(imagePath);
+    if (m_settingsDatabase->value(QStringLiteral("windowGeometry"), "NULL") == "NULL") {
+        int initWidth = 870;
+        int initHeight = 630;
+        QPoint center = qApp->desktop()->geometry().center();
+        QRect rect(center.x() - initWidth / 2, center.y() - initHeight / 2, initWidth, initHeight);
+        setGeometry(rect);
+        m_settingsDatabase->setValue(QStringLiteral("windowGeometry"), saveGeometry());
     }
+}
+
+void MainWindow::restoreStates()
+{
+    if (m_settingsDatabase->value(QStringLiteral("windowGeometry"), "NULL") != "NULL")
+        this->restoreGeometry(m_settingsDatabase->value(QStringLiteral("windowGeometry")).toByteArray());
+}
+
+NoteData* MainWindow::generateNote(const int noteID)
+{
+    NoteData* newNote = new NoteData(this);
+    newNote->setId(noteID);
+
+    QDateTime noteDate = QDateTime::currentDateTime();
+    newNote->setCreationDateTime(noteDate);
+    newNote->setLastModificationDateTime(noteDate);
+    newNote->setFullTitle(QStringLiteral("New Note"));
+
+    return newNote;
+}
+
+void MainWindow::showSticky(const QModelIndex& noteIndex)
+{
+    int noteID = noteIndex.data(NoteModel::NoteID).toInt();
+    if (m_stickys.contains(noteID)) {
+        StickyWindow* stickyWnd = m_stickys[noteID];
+        stickyWnd->show();
+    } else {
+        NoteData* note = m_noteModel->getNote(noteIndex);
+        StickyWindow* stickyWnd = new StickyWindow(note);
+        connect(stickyWnd, SIGNAL(saveNote(NoteData*)), this, SLOT(saveNoteToDB(NoteData*)));
+        m_stickys[noteID]
+            = stickyWnd;
+        stickyWnd->show();
+    }
+
+    //    QString content = noteIndex.data(NoteModel::NoteContent).toString();
+    //    QDateTime dateTime = noteIndex.data(NoteModel::NoteLastModificationDateTime).toDateTime();
+    //    int scrollbarPos = noteIndex.data(NoteModel::NoteScrollbarPos).toInt();
+}
+
+void MainWindow::saveNoteToDB(const QModelIndex& noteIndex)
+{
+    if (noteIndex.isValid()) {
+        QModelIndex indexInSrc = m_proxyModel->mapToSource(noteIndex);
+        NoteData* note = m_noteModel->getNote(indexInSrc);
+        if (note != Q_NULLPTR)
+            emit requestCreateUpdateNote(note);
+    }
+}
+
+void MainWindow::saveNoteToDB(NoteData* note)
+{
+    if (note != Q_NULLPTR)
+        emit requestCreateUpdateNote(note);
+}
+
+void MainWindow::createNewNote()
+{
+    ++m_noteCounter;
+    NoteData* tmpNote = generateNote(m_noteCounter);
+    // insert the new note to NoteModel
+    QModelIndex indexSrc = m_noteModel->insertNote(tmpNote, 0);
+    // update the current selected index
+    m_currentSelectedNoteProxy = m_proxyModel->mapFromSource(indexSrc);
+    m_noteView->setCurrentIndex(m_currentSelectedNoteProxy);
+}
+
+void MainWindow::InitData()
+{
+    emit requestNotesList();
+    /// Check if it is running with an argument (ex. hide)
+    if (qApp->arguments().contains(QStringLiteral("--autostart"))) {
+        //        setMainWindowVisibility(false);
+    }
+}
+
+void MainWindow::loadNotes(QList<NoteData*> noteList, int noteCounter)
+{
+    if (!noteList.isEmpty()) {
+        m_noteModel->addListNote(noteList);
+        m_noteModel->sort(0, Qt::AscendingOrder);
+    }
+    m_noteCounter = noteCounter;
+}
+
+void MainWindow::onNotePressed(const QModelIndex& index)
+{
+    if (sender() != Q_NULLPTR) {
+        QModelIndex indexInProxy = m_proxyModel->index(index.row(), 0);
+        selectNote(indexInProxy);
+        m_noteView->setCurrentRowActive(false);
+    }
+}
+
+void MainWindow::selectNote(const QModelIndex& noteIndex)
+{
+
+    // show the content of the pressed note in the text editor
+    showSticky(noteIndex);
+
+    //    m_noteView->selectionModel()->select(m_currentSelectedNoteProxy, QItemSelectionModel::ClearAndSelect);
+    //    m_noteView->setCurrentIndex(m_currentSelectedNoteProxy);
+    //    m_noteView->scrollTo(m_currentSelectedNoteProxy);
 }
 
 void MainWindow::closeEvent(QCloseEvent* event)
 {
-    QList<MainWindow*> windows = this->parentWidget()->findChildren<MainWindow*>();
-    if (!windows.isEmpty()) {
-        QFile file("record.xml");
-        file.open(QIODevice::WriteOnly);
-        QXmlStreamWriter xmlWriter(&file);
-        xmlWriter.setAutoFormatting(true);
-        xmlWriter.writeStartDocument();
-        xmlWriter.writeStartElement("windows");
-        foreach (MainWindow* mainwindow, windows) {
-            if (mainwindow->isVisible()) {
-                xmlWriter.writeStartElement("window");
-                xmlWriter.writeTextElement("x", QString::number(mainwindow->pos().x()));
-                xmlWriter.writeTextElement("y", QString::number(mainwindow->pos().y()));
-                xmlWriter.writeTextElement("width", QString::number(mainwindow->size().width()));
-                xmlWriter.writeTextElement("height", QString::number(mainwindow->size().height()));
-                xmlWriter.writeTextElement("style", mainwindow->style);
-                xmlWriter.writeTextElement("content", mainwindow->getContentText());
-                xmlWriter.writeEndElement();
-            }
-        }
-        xmlWriter.writeEndElement();
-        xmlWriter.writeEndDocument();
-        file.close();
+    if (windowState() != Qt::WindowFullScreen) {
+        m_settingsDatabase->setValue(QStringLiteral("windowGeometry"), saveGeometry());
     }
-    return QWidget::closeEvent(event);
-}
 
-void MainWindow::enterEvent(QEvent* event)
-{
-    this->titlebar->setBtnsVisible(true);
-    this->editbar->setVisible(true);
-    this->content->setFocus();
-    return QWidget::enterEvent(event);
-}
-
-void MainWindow::leaveEvent(QEvent* event)
-{
-    this->titlebar->setBtnsVisible(false);
-    this->editbar->setVisible(false);
-    this->styleOptionBar->setVisible(false);
-    this->content->clearFocus();
-    return QWidget::leaveEvent(event);
+    m_settingsDatabase->sync();
+    QMainWindow::closeEvent(event);
 }

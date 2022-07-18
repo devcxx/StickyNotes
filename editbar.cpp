@@ -14,22 +14,10 @@ EditBar::EditBar(QWidget* parent)
 
 void EditBar::initShortcut()
 {
-    QShortcut* bold = new QShortcut(this);
-    bold->setKey(tr("ctrl+b"));
-    bold->setAutoRepeat(false);
-    connect(bold, SIGNAL(activated()), boldButton, SLOT(click()));
-    QShortcut* italic = new QShortcut(this);
-    italic->setKey(tr("ctrl+i"));
-    italic->setAutoRepeat(false);
-    connect(italic, SIGNAL(activated()), italicButton, SLOT(click()));
-    QShortcut* underline = new QShortcut(this);
-    underline->setKey(tr("ctrl+u"));
-    underline->setAutoRepeat(false);
-    connect(underline, SIGNAL(activated()), underlineButton, SLOT(click()));
-    QShortcut* strike = new QShortcut(this);
-    strike->setKey(tr("ctrl+s"));
-    strike->setAutoRepeat(false);
-    connect(strike, SIGNAL(activated()), strikeButton, SLOT(click()));
+    new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_B), boldButton, SLOT(click()));
+    new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_I), italicButton, SLOT(click()));
+    new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_U), underlineButton, SLOT(click()));
+    new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_S), strikeButton, SLOT(click()));
 }
 
 void EditBar::initControl()

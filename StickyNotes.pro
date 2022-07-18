@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui sql concurrent
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -27,21 +27,33 @@ SOURCES += \
     editbar.cpp \
     main.cpp \
     mainwindow.cpp \
+    stickywindow.cpp \
     styleoptionbar.cpp \
     titlebar.cpp \
     textedit.cpp \
     vscrollbar.cpp \
     imagelib.cpp \
+    notedata.cpp \
+    dbmanager.cpp \
+    noteview.cpp \
+    notewidgetdelegate.cpp \
+    notemodel.cpp \
 
 HEADERS += \
     editbar.h \
     mainwindow.h \
+    stickywindow.h \
     styleoptionbar.h \
     titlebar.h \
     textedit.h \
     vscrollbar.h \
     imagelib.h \
     filedialog.h \
+    notedata.h \
+    dbmanager.h \
+    noteview.h \
+    notewidgetdelegate.h \
+    notemodel.h \
 
 RESOURCES += \
     assets.qrc

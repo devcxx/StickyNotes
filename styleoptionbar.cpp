@@ -11,12 +11,12 @@ StyleOptionBar::StyleOptionBar(QWidget* parent)
     pinkStyle_btn = new QPushButton(this);
     whiteStyle_btn = new QPushButton(this);
 
-    purpleStyle_btn->setObjectName("background: rgb(225,215,237);");
-    yellowStyle_btn->setObjectName("background: rgb(255,242,181);");
-    blueStyle_btn->setObjectName("background: rgb(202,232,255);");
-    greenStyle_btn->setObjectName("background: rgb(199,239,196);");
-    pinkStyle_btn->setObjectName("background: rgb(255,199,245);");
-    whiteStyle_btn->setObjectName("background: rgb(243,243,243);");
+    purpleStyle_btn->setObjectName("rgb(225,215,237);");
+    yellowStyle_btn->setObjectName("rgb(255,242,181);");
+    blueStyle_btn->setObjectName("rgb(202,232,255);");
+    greenStyle_btn->setObjectName("rgb(199,239,196);");
+    pinkStyle_btn->setObjectName("rgb(255,199,245);");
+    whiteStyle_btn->setObjectName("rgb(243,243,243);");
 
     purpleStyle_btn->setStyleSheet("QPushButton{background: rgb(225,215,237);width:30px;height:20px;border:none;}"
                                    "QPushButton:hover:pressed:{none}");
