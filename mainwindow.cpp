@@ -65,6 +65,7 @@ void MainWindow::initUI()
     horizontalLayout_scrollArea_3->addItem(horizontalSpacer_leftSearchEdit);
 
     QLineEdit* searchEdit = new QLineEdit(this);
+
     searchEdit->setObjectName(QString::fromUtf8("searchEdit"));
     QSizePolicy sizePolicy2(QSizePolicy::Preferred, QSizePolicy::Fixed);
     sizePolicy2.setHorizontalStretch(0);
@@ -88,7 +89,11 @@ void MainWindow::initUI()
     horizontalLayout_scrollArea_3->addWidget(searchEdit);
 
     m_createNewButton = new QPushButton(this);
-    m_createNewButton->setText(tr("Add"));
+    m_createNewButton->setFixedSize(24, 24);
+    m_createNewButton->setIcon(QIcon(":/Icons/add.png"));
+    QString styleSheet = "QPushButton{border:none;background-color:transparent}";
+    m_createNewButton->setStyleSheet(styleSheet);
+    m_createNewButton->setIconSize(QSize(24, 24));
     horizontalLayout_scrollArea_3->addWidget(m_createNewButton);
 
     QSpacerItem* horizontalSpacer_rightSearchEdit = new QSpacerItem(10, 20, QSizePolicy::Minimum, QSizePolicy::Minimum);

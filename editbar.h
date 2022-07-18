@@ -1,6 +1,7 @@
 #ifndef EDITBAR_H
 #define EDITBAR_H
 
+#include "basebutton.h"
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QWidget>
@@ -15,11 +16,11 @@ public:
 
 private:
     QHBoxLayout* edit_layout;
-    QPushButton* boldButton;
-    QPushButton* italicButton;
-    QPushButton* underlineButton;
-    QPushButton* strikeButton;
-    QPushButton* embedImageButton;
+    BaseButton* boldButton;
+    BaseButton* italicButton;
+    BaseButton* underlineButton;
+    BaseButton* strikeButton;
+    BaseButton* embedImageButton;
 
 signals:
     void boldBtnClickedSignal(bool checked);

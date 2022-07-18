@@ -5,5 +5,11 @@
         <file>Icons/mini.png</file>
         <file>Icons/new.png</file>
         <file>Icons/style.png</file>
+        <file>Icons/bold.png</file>
+        <file>Icons/italic.png</file>
+        <file>Icons/underline.png</file>
+        <file>Icons/strikethrough.png</file>
+        <file>Icons/image.png</file>
+        <file>Icons/add.png</file>
     </qresource>
 </RCC>

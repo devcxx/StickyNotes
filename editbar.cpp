@@ -22,41 +22,13 @@ void EditBar::initShortcut()
 
 void EditBar::initControl()
 {
-    boldButton = new QPushButton(this);
-    boldButton->setCheckable(true);
-    boldButton->setToolTip(tr("Bold"));
-    boldButton->setText("B");
-    boldButton->setFont(QFont(QStringLiteral("Microsoft Yahei"), 16, QFont::Bold));
-    QString ss = QStringLiteral("QPushButton { "
-                                "  width: 16; "
-                                "  height: 16;"
-                                "  border: none; "
-                                "  padding: 0px; "
-                                "  color: black;"
-                                "}");
-    boldButton->setStyleSheet(ss);
+    boldButton = new BaseButton(":/Icons/bold.png", tr("Bold"), this, true);
 
-    italicButton = new QPushButton(this);
-    italicButton->setCheckable(true);
-    italicButton->setToolTip(tr("Italic"));
-    italicButton->setFont(QFont(QStringLiteral("Microsoft Yahei"), 16, QFont::Bold, true));
-    italicButton->setText("I");
-    italicButton->setStyleSheet(ss);
+    italicButton = new BaseButton(":/Icons/italic.png", tr("Italic"), this, true);
 
-    underlineButton = new QPushButton(this);
-    underlineButton->setCheckable(true);
-    underlineButton->setToolTip(tr("Underline"));
-    QFont underlineFont(QStringLiteral("Microsoft Yahei"), 16, QFont::Bold);
-    underlineFont.setUnderline(true);
-    underlineButton->setText("U");
-    underlineButton->setFont(underlineFont);
-    underlineButton->setStyleSheet(ss);
+    underlineButton = new BaseButton(":/Icons/underline.png", tr("Underline"), this, true);
 
-    strikeButton = new QPushButton(this);
-    strikeButton->setCheckable(true);
-    strikeButton->setToolTip(tr("Strike through"));
-    strikeButton->setText("S");
-    strikeButton->setStyleSheet(ss);
+    strikeButton = new BaseButton(":/Icons/strikethrough.png", tr("Strike through"), this, true);
 
     edit_layout = new QHBoxLayout(this);
     //    edit_layout->setContentsMargins(10,0,10,0);
@@ -65,11 +37,8 @@ void EditBar::initControl()
     edit_layout->addWidget(underlineButton);
     edit_layout->addWidget(strikeButton);
 
-    embedImageButton = new QPushButton(this);
-    embedImageButton->setCheckable(true);
-    embedImageButton->setToolTip(tr("Embed image"));
-    embedImageButton->setText("EI");
-    embedImageButton->setStyleSheet(ss);
+    embedImageButton = new BaseButton(":/Icons/image.png", tr("Embed image"), this, true);
+
     edit_layout->addWidget(embedImageButton);
 
     edit_layout->addStretch();
@@ -78,9 +47,9 @@ void EditBar::initControl()
 
 void EditBar::initConnection()
 {
-    connect(boldButton, SIGNAL(clicked(bool)), this, SIGNAL(boldBtnClickedSignal(bool)));
-    connect(italicButton, SIGNAL(clicked(bool)), this, SIGNAL(italicBtnClickedSignal(bool)));
-    connect(underlineButton, SIGNAL(clicked(bool)), this, SIGNAL(underlineBtnClickedSignal(bool)));
-    connect(strikeButton, SIGNAL(clicked(bool)), this, SIGNAL(strikeBtnClickedSignal(bool)));
-    connect(embedImageButton, SIGNAL(clicked(bool)), this, SIGNAL(embedImageBtnClickedSignal(bool)));
+    connect(boldButton, SIGNAL(toggled(bool)), this, SIGNAL(boldBtnClickedSignal(bool)));
+    connect(italicButton, SIGNAL(toggled(bool)), this, SIGNAL(italicBtnClickedSignal(bool)));
+    connect(underlineButton, SIGNAL(toggled(bool)), this, SIGNAL(underlineBtnClickedSignal(bool)));
+    connect(strikeButton, SIGNAL(toggled(bool)), this, SIGNAL(strikeBtnClickedSignal(bool)));
+    connect(embedImageButton, SIGNAL(toggled(bool)), this, SIGNAL(embedImageBtnClickedSignal(bool)));
 }

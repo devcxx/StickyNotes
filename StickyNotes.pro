@@ -38,6 +38,7 @@ SOURCES += \
     noteview.cpp \
     notewidgetdelegate.cpp \
     notemodel.cpp \
+    basebutton.cpp \
 
 HEADERS += \
     editbar.h \
@@ -54,6 +55,7 @@ HEADERS += \
     noteview.h \
     notewidgetdelegate.h \
     notemodel.h \
+    basebutton.h \
 
 RESOURCES += \
     assets.qrc
