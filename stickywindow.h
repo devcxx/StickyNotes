@@ -58,11 +58,13 @@ private slots:
 
 signals:
     void saveNote(NoteData* note);
+    void deleteNote(NoteData* note);
+    void createNewNote();
 
 protected:
-    virtual void closeEvent(QCloseEvent* event) override;
     virtual void enterEvent(QEvent* event) override;
     virtual void leaveEvent(QEvent* event) override;
+    virtual void moveEvent(QMoveEvent* event) override;
 };
 
 #endif // STICKYWINDOW_H

@@ -50,6 +50,7 @@ private slots:
     void selectNote(const QModelIndex& noteIndex);
     void saveNoteToDB(const QModelIndex& noteIndex);
     void saveNoteToDB(NoteData* noteData);
+    void deleteNote(NoteData* noteData);
 
 protected:
     void closeEvent(QCloseEvent* event) Q_DECL_OVERRIDE;

@@ -6,6 +6,7 @@
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QList>
+#include <QScreen>
 #include <QWidget>
 #include <QXmlStreamWriter>
 
@@ -103,14 +104,15 @@ void StickyWindow::initEditbar()
 
 void StickyWindow::onNewBtnClicked()
 {
-    StickyWindow* newWindow = new StickyWindow(Q_NULLPTR, this->parentW);
-    newWindow->setGeometry(this->pos().x() + 20,
-        this->pos().y() + 20,
-        this->size().width(),
-        this->size().height());
-    newWindow->setStyleSheet(this->style);
-    newWindow->show();
-    newWindow->setFocus();
+    //    StickyWindow* newWindow = new StickyWindow(Q_NULLPTR, this->parentW);
+    //    newWindow->setGeometry(this->pos().x() + 20,
+    //        this->pos().y() + 20,
+    //        this->size().width(),
+    //        this->size().height());
+    //    newWindow->setStyleSheet(this->style);
+    //    newWindow->show();
+    //    newWindow->setFocus();
+    emit createNewNote();
 }
 
 void StickyWindow::onSettingBtnClicked()
@@ -124,33 +126,20 @@ void StickyWindow::onSettingBtnClicked()
 
 void StickyWindow::onDeleteBtnClicked()
 {
-    this->hide();
-    bool isAllDeleted = true;
-    QList<StickyWindow*> windows = this->parentWidget()->findChildren<StickyWindow*>();
-    if (!windows.isEmpty()) {
-        foreach (StickyWindow* mainwindow, windows) {
-            if (mainwindow->isVisible()) {
-                isAllDeleted = false;
-                break;
-            }
-        }
-    }
-    if (isAllDeleted)
-        this->onCloseBtnClicked();
+    this->close();
+    emit deleteNote(_noteData);
 }
 
 void StickyWindow::onCloseBtnClicked()
 {
     //    this->close();
-    QByteArray geometry = saveGeometry();
-    _noteData->setGeometry(geometry);
-    emit saveNote(_noteData);
+
     hide();
 }
 
 void StickyWindow::onStyleBtnClicked(QString btnName)
 {
-    QString style = QString("background:%1").arg(btnName);
+    QString style = QString("background:%1;").arg(btnName);
     this->style = style;
     this->setStyleSheet(style);
     this->styleOptionBar->setVisible(false);
@@ -318,38 +307,6 @@ void StickyWindow::onTextEditTextChanged()
         emit saveNote(_noteData);
     }
 }
-void StickyWindow::closeEvent(QCloseEvent* event)
-{
-    //    QList<StickyWindow*> windows = this->parentWidget()->findChildren<StickyWindow*>();
-    //    if (!windows.isEmpty()) {
-    //        QFile file("record.xml");
-    //        file.open(QIODevice::WriteOnly);
-    //        QXmlStreamWriter xmlWriter(&file);
-    //        xmlWriter.setAutoFormatting(true);
-    //        xmlWriter.writeStartDocument();
-    //        xmlWriter.writeStartElement("windows");
-    //        foreach (StickyWindow* mainwindow, windows) {
-    //            if (mainwindow->isVisible()) {
-    //                xmlWriter.writeStartElement("window");
-    //                xmlWriter.writeTextElement("x", QString::number(mainwindow->pos().x()));
-    //                xmlWriter.writeTextElement("y", QString::number(mainwindow->pos().y()));
-    //                xmlWriter.writeTextElement("width", QString::number(mainwindow->size().width()));
-    //                xmlWriter.writeTextElement("height", QString::number(mainwindow->size().height()));
-    //                xmlWriter.writeTextElement("style", mainwindow->style);
-    //                xmlWriter.writeTextElement("content", mainwindow->getContentText());
-    //                xmlWriter.writeEndElement();
-    //            }
-    //        }
-    //        xmlWriter.writeEndElement();
-    //        xmlWriter.writeEndDocument();
-    //        file.close();
-    //    }
-    //    return QWidget::closeEvent(event);
-    //    QString geometry = saveGeometry();
-    //    _noteData->setGeometry(geometry);
-    //    emit saveNote(_noteData);
-    hide();
-}
 
 void StickyWindow::enterEvent(QEvent* event)
 {
@@ -366,4 +323,11 @@ void StickyWindow::leaveEvent(QEvent* event)
     this->styleOptionBar->setVisible(false);
     this->textEdit->clearFocus();
     return QWidget::leaveEvent(event);
+}
+
+void StickyWindow::moveEvent(QMoveEvent* event)
+{
+    QByteArray geometry = saveGeometry();
+    _noteData->setGeometry(geometry);
+    emit saveNote(_noteData);
 }

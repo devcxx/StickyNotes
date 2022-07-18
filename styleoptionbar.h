@@ -10,6 +10,8 @@ class StyleOptionBar : public QWidget {
 public:
     explicit StyleOptionBar(QWidget* parent = nullptr);
     ~StyleOptionBar();
+    void init();
+
 signals:
     void styleBtnClickedSignal(QString);
 
@@ -19,7 +21,8 @@ private:
     QPushButton* blueStyle_btn;
     QPushButton* greenStyle_btn;
     QPushButton* pinkStyle_btn;
-    QPushButton* whiteStyle_btn;
+    QPushButton* grayStyle_btn;
+    QPushButton* charcoalStyle_btn;
     QHBoxLayout* styleOptions;
 private slots:
     void onStyleBtnClicked();

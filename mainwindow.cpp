@@ -218,13 +218,17 @@ void MainWindow::showSticky(const QModelIndex& noteIndex)
     if (m_stickys.contains(noteID)) {
         StickyWindow* stickyWnd = m_stickys[noteID];
         stickyWnd->show();
+        stickyWnd->raise();
     } else {
         NoteData* note = m_noteModel->getNote(noteIndex);
         StickyWindow* stickyWnd = new StickyWindow(note);
         connect(stickyWnd, SIGNAL(saveNote(NoteData*)), this, SLOT(saveNoteToDB(NoteData*)));
+        connect(stickyWnd, SIGNAL(deleteNote(NoteData*)), this, SLOT(deleteNote(NoteData*)));
+        connect(stickyWnd, SIGNAL(createNewNote()), this, SLOT(createNewNote()));
         m_stickys[noteID]
             = stickyWnd;
         stickyWnd->show();
+        stickyWnd->raise();
     }
 
     //    QString content = noteIndex.data(NoteModel::NoteContent).toString();
@@ -246,6 +250,15 @@ void MainWindow::saveNoteToDB(NoteData* note)
 {
     if (note != Q_NULLPTR)
         emit requestCreateUpdateNote(note);
+}
+
+void MainWindow::deleteNote(NoteData* noteData)
+{
+    QModelIndex indexToBeRemoved = m_noteModel->getNoteIndex(noteData);
+    if (indexToBeRemoved.isValid()) {
+        m_noteModel->removeNote(indexToBeRemoved);
+        emit requestDeleteNote(noteData);
+    }
 }
 
 void MainWindow::createNewNote()
