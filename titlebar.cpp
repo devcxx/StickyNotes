@@ -21,15 +21,18 @@ void TitleBar::initControl()
 {
     this->setFocusPolicy(Qt::NoFocus);
     new_btn = new QPushButton(this);
+    new_btn->setToolTip(tr("Create New Note"));
     setting_btn = new QPushButton(this);
     delete_btn = new QPushButton(this);
+    delete_btn->setToolTip(tr("Delete Note"));
     close_btn = new QPushButton(this);
+    close_btn->setToolTip(tr("Close"));
 
     new_btn->setStyleSheet("QPushButton{background: transparent;"
                            "width:24px;height:24px;image:url(:/Icons/new.png)}"
                            "QPushButton:hover:pressed:{none}");
     setting_btn->setStyleSheet("QPushButton{background: transparent;"
-                               "width:24px;height:24px;image:url(:/Icons/style.png)}"
+                               "width:24px;height:24px;image:url(:/Icons/color.png)}"
                                "QPushButton:hover:pressed:{none}");
     delete_btn->setStyleSheet("QPushButton{background: transparent;"
                               "width:24px;height:24px;image:url(:/Icons/delete.png)}"

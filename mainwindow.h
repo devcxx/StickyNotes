@@ -11,6 +11,7 @@
 #include <QSettings>
 #include <QSortFilterProxyModel>
 #include <QThread>
+#include <QToolButton>
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -26,9 +27,12 @@ private:
     void restoreStates();
     NoteData* generateNote(const int noteID);
     void showSticky(const QModelIndex& noteIndex);
+    void setupSearchEdit();
 
 private:
     QPushButton* m_createNewButton;
+    QToolButton* m_clearButton;
+    QLineEdit* m_searchEdit;
     NoteView* m_noteView;
     NoteModel* m_noteModel;
     NoteModel* m_deletedNotesModel;

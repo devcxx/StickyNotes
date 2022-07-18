@@ -11,5 +11,8 @@
         <file>Icons/strikethrough.png</file>
         <file>Icons/image.png</file>
         <file>Icons/add.png</file>
+        <file>Icons/color.png</file>
+        <file>Icons/closeButton.png</file>
+        <file>Icons/magnifyingGlass.png</file>
     </qresource>
 </RCC>

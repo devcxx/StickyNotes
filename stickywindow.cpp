@@ -8,7 +8,6 @@
 #include <QList>
 #include <QScreen>
 #include <QWidget>
-#include <QXmlStreamWriter>
 
 StickyWindow::StickyWindow(NoteData* noteData, QWidget* parent)
     : QMainWindow(parent)
@@ -18,6 +17,8 @@ StickyWindow::StickyWindow(NoteData* noteData, QWidget* parent)
     //    this->setAttribute(Qt::WA_DeleteOnClose);
     this->setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
     this->setCentralWidget(new QWidget());
+
+    setMinimumSize(306, 313);
 
     initTitlebar();
     initEditbar();
