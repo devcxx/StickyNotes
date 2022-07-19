@@ -41,7 +41,7 @@ void MainWindow::initUI()
     sizePolicy.setHeightForWidth(this->sizePolicy().hasHeightForWidth());
     setSizePolicy(sizePolicy);
     setMinimumSize(QSize(320, 500));
-
+    setStyleSheet("background:white;");
     setDocumentMode(false);
     setTabShape(QTabWidget::Rounded);
     QWidget* centralWidget = new QWidget(this);
@@ -96,9 +96,11 @@ void MainWindow::initUI()
     m_newNoteButton = new QPushButton(this);
     m_newNoteButton->setFixedSize(24, 24);
     m_newNoteButton->setIcon(QIcon(":/Icons/add.png"));
-    QString styleSheet = "QPushButton{border:none;background-color:transparent}";
+    QString styleSheet = "QPushButton{border:none;background-color:transparent;padding-top:4px}";
     m_newNoteButton->setStyleSheet(styleSheet);
     m_newNoteButton->setIconSize(QSize(24, 24));
+    m_newNoteButton->setToolTip(tr("Create New Note"));
+    horizontalLayout_scrollArea_3->setSpacing(6);
     horizontalLayout_scrollArea_3->addWidget(m_newNoteButton);
 
     QSpacerItem* horizontalSpacer_rightSearchEdit = new QSpacerItem(10, 20, QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -270,8 +272,8 @@ void MainWindow::setupSearchEdit()
     m_searchEdit->setAttribute(Qt::WA_MacShowFocusRect, 0);
 
     m_searchEdit->setStyleSheet("QLineEdit{ "
-                                "  padding-left: 21px;"
-                                "  padding-right: 19px;"
+                                "  padding-left: 10px;"
+                                "  padding-right: 20px;"
                                 "  border: 1px solid rgb(205, 205, 205);"
                                 "  border-radius: 3px;"
                                 "  selection-background-color: rgb(61, 155, 218);"
@@ -295,19 +297,19 @@ void MainWindow::setupSearchEdit()
     m_clearButton->hide();
 
     // search button
-    QToolButton* searchButton = new QToolButton(m_searchEdit);
-    QPixmap newPixmap(QStringLiteral(":Icons/magnifyingGlass.png"));
-    searchButton->setIcon(QIcon(newPixmap));
-    QSize searchSize(24, 25);
-    searchButton->setIconSize(searchSize);
-    searchButton->setCursor(Qt::ArrowCursor);
+    //    QToolButton* searchButton = new QToolButton(m_searchEdit);
+    //    QPixmap newPixmap(QStringLiteral(":Icons/magnifyingGlass.png"));
+    //    searchButton->setIcon(QIcon(newPixmap));
+    //    QSize searchSize(24, 25);
+    //    searchButton->setIconSize(searchSize);
+    //    searchButton->setCursor(Qt::ArrowCursor);
 
     // layout
     QBoxLayout* layout = new QBoxLayout(QBoxLayout::RightToLeft, m_searchEdit);
     layout->setContentsMargins(0, 0, 3, 0);
     layout->addWidget(m_clearButton);
     layout->addStretch();
-    layout->addWidget(searchButton);
+    //    layout->addWidget(searchButton);
     m_searchEdit->setLayout(layout);
 
     m_searchEdit->installEventFilter(this);
