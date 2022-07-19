@@ -208,7 +208,10 @@ void NoteWidgetDelegate::paintLabels(QPainter* painter, const QStyleOptionViewIt
     double rowRate = m_timeLine->currentFrame() / (m_maxFrame * 1.0);
     double currRowHeight = m_rowHeight * rowRate;
 
-    QString noteColor { index.data(NoteModel::NoteColor).toString() };
+    QString noteColor = index.data(NoteModel::NoteColor).toString();
+    if (noteColor.isEmpty()) {
+        noteColor = "#e5b804";
+    }
     painter->fillRect(rowPosX, rowPosY, colorSpanWidth, rowHeight, QColor(noteColor));
 
     auto drawStr = [painter](double posX, double posY, double width, double height, QColor color, QFont font, QString str) {

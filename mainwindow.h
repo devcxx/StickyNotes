@@ -7,6 +7,7 @@
 #include "stickywindow.h"
 #include <QHash>
 #include <QMainWindow>
+#include <QObject>
 #include <QPushButton>
 #include <QQueue>
 #include <QSettings>
@@ -14,7 +15,6 @@
 #include <QThread>
 #include <QToolButton>
 #include <QWidget>
-#include <QObject>
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -31,6 +31,7 @@ private:
     void restoreStates();
     NoteData* generateNote(const int noteID);
     void showSticky(const QModelIndex& noteIndex);
+
     void setupSearchEdit();
     void findNotesContain(const QString& keyword);
     void selectFirstNote();
@@ -73,6 +74,9 @@ private slots:
     void selectNoteUp();
     void deleteSelectedNote();
     void onNewNoteButtonClicked();
+    void showContextMenu(const QPoint& pos);
+    void showSelectedSticky();
+    void deleteSelectedSticky();
 
 protected:
     void closeEvent(QCloseEvent* event) Q_DECL_OVERRIDE;

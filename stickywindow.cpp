@@ -75,11 +75,13 @@ void StickyWindow::setNoteData(NoteData* noteData)
             qDebug() << _noteData->geometry();
             restoreGeometry(_noteData->geometry());
         }
+        QString noteColor = "#e5b804";
         if (!_noteData->color().isEmpty()) {
-            QString style = QString("background:%1").arg(_noteData->color());
-            this->style = style;
-            this->setStyleSheet(style);
+            noteColor = _noteData->color();
         }
+        QString style = QString("background:%1").arg(noteColor);
+        this->style = style;
+        this->setStyleSheet(style);
     }
 }
 

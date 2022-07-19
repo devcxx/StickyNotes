@@ -7,6 +7,7 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QLineEdit>
+#include <QMenu>
 #include <QPushButton>
 #include <QShortcut>
 #include <QSplitter>
@@ -178,7 +179,11 @@ void MainWindow::setupModelView()
     m_proxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
 
     m_noteView->setItemDelegate(new NoteWidgetDelegate(m_noteView));
+
     m_noteView->setModel(m_proxyModel);
+    m_noteView->setContextMenuPolicy(Qt::CustomContextMenu);
+    qDebug() << connect(m_noteView, SIGNAL(customContextMenuRequested(const QPoint&)),
+        this, SLOT(showContextMenu(const QPoint&)));
 }
 
 void MainWindow::setupSignalsSlots()
@@ -198,6 +203,22 @@ void MainWindow::setupSignalsSlots()
     connect(m_searchEdit, &QLineEdit::returnPressed, this, &MainWindow::onSearchEditReturnPressed);
     // clear button
     connect(m_clearButton, &QToolButton::clicked, this, &MainWindow::onClearButtonClicked);
+
+    // note pressed
+    connect(m_noteView, &NoteView::pressed, this, &MainWindow::onNotePressed);
+    // noteView viewport pressed
+    connect(m_noteView, &NoteView::viewportPressed, this, [this]() {
+        if (m_proxyModel->rowCount() > 1) {
+            QModelIndex indexInProxy = m_proxyModel->index(1, 0);
+            selectNote(indexInProxy);
+        } else if (m_proxyModel->rowCount() == 1) {
+            QModelIndex indexInProxy = m_proxyModel->index(0, 0);
+            deleteNote(indexInProxy, false);
+        }
+    });
+    // note model rows moved
+    connect(m_noteModel, &NoteModel::rowsAboutToBeMoved, m_noteView, &NoteView::rowsAboutToBeMoved);
+    connect(m_noteModel, &NoteModel::rowsMoved, m_noteView, &NoteView::rowsMoved);
 }
 
 void MainWindow::setupShortcuts()
@@ -522,6 +543,35 @@ void MainWindow::onNewNoteButtonClicked()
     this->createNewNote();
 }
 
+void MainWindow::showContextMenu(const QPoint&)
+{
+    QMenu* cmenu = new QMenu(m_noteView);
+
+    QAction* showAction = cmenu->addAction(tr("Show Note"));
+    QAction* deleteAction = cmenu->addAction(tr("Delete Note"));
+    connect(showAction, SIGNAL(triggered(bool)), this, SLOT(showSelectedSticky()));
+    connect(deleteAction, SIGNAL(triggered(bool)), this, SLOT(deleteSelectedSticky()));
+    cmenu->exec(QCursor::pos());
+}
+
+void MainWindow::showSelectedSticky()
+{
+    QModelIndexList selectedIndexes = m_noteView->selectionModel()->selectedIndexes();
+    QModelIndex index;
+    foreach (index, selectedIndexes) {
+        showSticky(index);
+    }
+}
+
+void MainWindow::deleteSelectedSticky()
+{
+    QModelIndexList selectedIndexes = m_noteView->selectionModel()->selectedIndexes();
+    QModelIndex index;
+    foreach (index, selectedIndexes) {
+        deleteNote(index);
+    }
+}
+
 void MainWindow::createNewNote()
 {
     ++m_noteCounter;
@@ -564,7 +614,7 @@ void MainWindow::selectNote(const QModelIndex& noteIndex)
 {
     // show the content of the pressed note in the text editor
     showSticky(noteIndex);
-
+    m_currentSelectedNoteProxy = noteIndex;
     m_noteView->selectionModel()->select(m_currentSelectedNoteProxy, QItemSelectionModel::ClearAndSelect);
     m_noteView->setCurrentIndex(m_currentSelectedNoteProxy);
     m_noteView->scrollTo(m_currentSelectedNoteProxy);
