@@ -7,6 +7,7 @@
 #include <QPushButton>
 #include <QTextEdit>
 #include <QWidget>
+#include "basebutton.h"
 
 #define BTN_WIDTH 24
 #define TITLEBAR_HEIGHT 28
@@ -31,10 +32,10 @@ private slots:
     void onCloseBtnClicked();
 
 private:
-    QPushButton* new_btn;
-    QPushButton* setting_btn;
-    QPushButton* delete_btn;
-    QPushButton* close_btn;
+    BaseButton* new_btn;
+    BaseButton* setting_btn;
+    BaseButton* delete_btn;
+    BaseButton* close_btn;
     QHBoxLayout* titlebar_layout;
 
     bool m_bPressed;

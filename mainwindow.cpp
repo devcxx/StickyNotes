@@ -2,6 +2,7 @@
 #include "noteview.h"
 #include "notewidgetdelegate.h"
 #include <QApplication>
+#include <QDebug>
 #include <QDesktopWidget>
 #include <QDir>
 #include <QFileInfo>

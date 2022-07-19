@@ -13,6 +13,8 @@
 #include <QSortFilterProxyModel>
 #include <QThread>
 #include <QToolButton>
+#include <QWidget>
+#include <QObject>
 
 class MainWindow : public QMainWindow {
     Q_OBJECT

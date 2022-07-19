@@ -20,26 +20,23 @@ TitleBar::~TitleBar()
 void TitleBar::initControl()
 {
     this->setFocusPolicy(Qt::NoFocus);
-    new_btn = new QPushButton(this);
-    new_btn->setToolTip(tr("Create New Note"));
-    setting_btn = new QPushButton(this);
-    delete_btn = new QPushButton(this);
-    delete_btn->setToolTip(tr("Delete Note"));
-    close_btn = new QPushButton(this);
-    close_btn->setToolTip(tr("Close"));
+    new_btn = new BaseButton(":/Icons/new.png", tr("Create New Note"), this, false);
+    setting_btn = new BaseButton(":/Icons/color.png", tr("Note Color"), this, false);
+    delete_btn = new BaseButton(":/Icons/delete.png", tr("Delete Note"), this, false);
+    close_btn = new BaseButton(":/Icons/close.png", tr("Close"), this, false);
 
-    new_btn->setStyleSheet("QPushButton{background: transparent;"
-                           "width:24px;height:24px;image:url(:/Icons/new.png)}"
-                           "QPushButton:hover:pressed:{none}");
-    setting_btn->setStyleSheet("QPushButton{background: transparent;"
-                               "width:24px;height:24px;image:url(:/Icons/color.png)}"
-                               "QPushButton:hover:pressed:{none}");
-    delete_btn->setStyleSheet("QPushButton{background: transparent;"
-                              "width:24px;height:24px;image:url(:/Icons/delete.png)}"
-                              "QPushButton:hover:pressed:{none}");
-    close_btn->setStyleSheet("QPushButton{background: transparent;"
-                             "width:24px;height:24px;image:url(:/Icons/close.png)}"
-                             "QPushButton:hover:pressed:{none}");
+    //    new_btn->setStyleSheet("QPushButton{background: transparent;"
+    //                           "width:24px;height:24px;image:url(:/Icons/new.png)}"
+    //                           "QPushButton:hover:pressed:{none}");
+    //    setting_btn->setStyleSheet("QPushButton{background: transparent;"
+    //                               "width:24px;height:24px;image:url(:/Icons/color.png)}"
+    //                               "QPushButton:hover:pressed:{none}");
+    //    delete_btn->setStyleSheet("QPushButton{background: transparent;"
+    //                              "width:24px;height:24px;image:url(:/Icons/delete.png)}"
+    //                              "QPushButton:hover:pressed:{none}");
+    //    close_btn->setStyleSheet("QPushButton{background: transparent;"
+    //                             "width:24px;height:24px;image:url(:/Icons/close.png)}"
+    //                             "QPushButton:hover:pressed:{none}");
 
     titlebar_layout = new QHBoxLayout(this);
     titlebar_layout->addWidget(new_btn);
