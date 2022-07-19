@@ -10,7 +10,7 @@ BaseButton::BaseButton(const QPixmap& pixmap, const QString& tooltip, QWidget* p
 {
 
     setCheckable(checkable);
-    setFixedSize(24, 24);
+    setFixedSize(20, 20);
     setIcon(pixmap);
     setIconSize(QSize(width(), height()));
 

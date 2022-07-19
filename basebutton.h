@@ -6,8 +6,8 @@
 class BaseButton : public QPushButton {
     Q_OBJECT
 public:
-    BaseButton(const QPixmap& pixmap, const QString& tooltip = QStringLiteral(), QWidget* parent = nullptr, bool checkable = true);
-    BaseButton(const QString& pixmapUrl, const QString& tooltip = QStringLiteral(), QWidget* parent = nullptr, bool checkable = true);
+    BaseButton(const QPixmap& pixmap, const QString& tooltip = "", QWidget* parent = nullptr, bool checkable = true);
+    BaseButton(const QString& pixmapUrl, const QString& tooltip = "", QWidget* parent = nullptr, bool checkable = true);
     void enterEvent(QEvent*);
     void leaveEvent(QEvent*);
     void enableShadowEffect();

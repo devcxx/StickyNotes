@@ -8,6 +8,7 @@
 #include <QHash>
 #include <QMainWindow>
 #include <QPushButton>
+#include <QQueue>
 #include <QSettings>
 #include <QSortFilterProxyModel>
 #include <QThread>
@@ -23,14 +24,18 @@ private:
     void setupDatabases();
     void setupModelView();
     void setupSignalsSlots();
+    void setupShortcuts();
     void initializeSettingsDatabase();
     void restoreStates();
     NoteData* generateNote(const int noteID);
     void showSticky(const QModelIndex& noteIndex);
     void setupSearchEdit();
+    void findNotesContain(const QString& keyword);
+    void selectFirstNote();
+    void highlightSearch() const;
 
 private:
-    QPushButton* m_createNewButton;
+    QPushButton* m_newNoteButton;
     QToolButton* m_clearButton;
     QLineEdit* m_searchEdit;
     NoteView* m_noteView;
@@ -38,6 +43,7 @@ private:
     NoteModel* m_deletedNotesModel;
     QSortFilterProxyModel* m_proxyModel;
     QModelIndex m_currentSelectedNoteProxy;
+    QModelIndex m_selectedNoteBeforeSearchingInSource;
     int m_noteCounter;
 
     DBManager* m_dbManager;
@@ -45,6 +51,7 @@ private:
     QSettings* m_settingsDatabase;
 
     QHash<int, StickyWindow*> m_stickys;
+    QQueue<QString> m_searchQueue;
 
 private slots:
     void createNewNote();
@@ -55,6 +62,15 @@ private slots:
     void saveNoteToDB(const QModelIndex& noteIndex);
     void saveNoteToDB(NoteData* noteData);
     void deleteNote(NoteData* noteData);
+    void deleteNote(const QModelIndex& noteIndex, bool isFromUser = true);
+    void onSearchEditTextChanged(const QString& keyword);
+    void onSearchEditReturnPressed();
+    void onClearButtonClicked();
+    void clearSearch();
+    void selectNoteDown();
+    void selectNoteUp();
+    void deleteSelectedNote();
+    void onNewNoteButtonClicked();
 
 protected:
     void closeEvent(QCloseEvent* event) Q_DECL_OVERRIDE;

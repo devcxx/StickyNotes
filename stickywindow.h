@@ -53,6 +53,7 @@ private slots:
     void onItalicBtnClicked(bool checked);
     void onUnderlineBtnClicked(bool checked);
     void onStrikeBtnClicked(bool checked);
+    void onListBtnClicked(bool checked);
     void onEmbedImageBtnClicked(bool checked);
     void onTextEditTextChanged();
 

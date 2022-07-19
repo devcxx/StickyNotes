@@ -7,6 +7,7 @@
 #include <QFileInfo>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QShortcut>
 #include <QSplitter>
 #include <QTimer>
 #include <QVBoxLayout>
@@ -26,6 +27,7 @@ MainWindow::MainWindow(QWidget* parent)
     setupModelView();
     setupSearchEdit();
     setupSignalsSlots();
+    setupShortcuts();
     restoreStates();
     QTimer::singleShot(200, this, SLOT(InitData()));
 }
@@ -91,13 +93,13 @@ void MainWindow::initUI()
 
     horizontalLayout_scrollArea_3->addWidget(m_searchEdit);
 
-    m_createNewButton = new QPushButton(this);
-    m_createNewButton->setFixedSize(24, 24);
-    m_createNewButton->setIcon(QIcon(":/Icons/add.png"));
+    m_newNoteButton = new QPushButton(this);
+    m_newNoteButton->setFixedSize(24, 24);
+    m_newNoteButton->setIcon(QIcon(":/Icons/add.png"));
     QString styleSheet = "QPushButton{border:none;background-color:transparent}";
-    m_createNewButton->setStyleSheet(styleSheet);
-    m_createNewButton->setIconSize(QSize(24, 24));
-    horizontalLayout_scrollArea_3->addWidget(m_createNewButton);
+    m_newNoteButton->setStyleSheet(styleSheet);
+    m_newNoteButton->setIconSize(QSize(24, 24));
+    horizontalLayout_scrollArea_3->addWidget(m_newNoteButton);
 
     QSpacerItem* horizontalSpacer_rightSearchEdit = new QSpacerItem(10, 20, QSizePolicy::Minimum, QSizePolicy::Minimum);
     horizontalLayout_scrollArea_3->addItem(horizontalSpacer_rightSearchEdit);
@@ -178,7 +180,7 @@ void MainWindow::setupModelView()
 
 void MainWindow::setupSignalsSlots()
 {
-    connect(m_createNewButton, &QPushButton::pressed, this, &MainWindow::createNewNote);
+    connect(m_newNoteButton, &QPushButton::clicked, this, &MainWindow::onNewNoteButtonClicked);
     connect(this, &MainWindow::requestNotesList,
         m_dbManager, &DBManager::onNotesListRequested, Qt::BlockingQueuedConnection);
     connect(this, &MainWindow::requestCreateUpdateNote,
@@ -187,6 +189,22 @@ void MainWindow::setupSignalsSlots()
         m_dbManager, &DBManager::onDeleteNoteRequested);
     connect(m_dbManager, &DBManager::notesReceived, this, &MainWindow::loadNotes);
     connect(m_noteView, &NoteView::pressed, this, &MainWindow::onNotePressed);
+    // line edit text changed
+    connect(m_searchEdit, &QLineEdit::textChanged, this, &MainWindow::onSearchEditTextChanged);
+    // line edit enter key pressed
+    connect(m_searchEdit, &QLineEdit::returnPressed, this, &MainWindow::onSearchEditReturnPressed);
+    // clear button
+    connect(m_clearButton, &QToolButton::clicked, this, &MainWindow::onClearButtonClicked);
+}
+
+void MainWindow::setupShortcuts()
+{
+    new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_N), this, SLOT(createNewNote()));
+    new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_D), this, SLOT(deleteSelectedNote()));
+    new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F), m_searchEdit, SLOT(setFocus()));
+    new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_E), m_searchEdit, SLOT(clear()));
+    new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Down), this, SLOT(selectNoteDown()));
+    new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Up), this, SLOT(selectNoteUp()));
 }
 
 void MainWindow::initializeSettingsDatabase()
@@ -222,6 +240,9 @@ NoteData* MainWindow::generateNote(const int noteID)
 
 void MainWindow::showSticky(const QModelIndex& noteIndex)
 {
+    if (!noteIndex.isValid())
+        return;
+
     int noteID = noteIndex.data(NoteModel::NoteID).toInt();
     if (m_stickys.contains(noteID)) {
         StickyWindow* stickyWnd = m_stickys[noteID];
@@ -292,6 +313,37 @@ void MainWindow::setupSearchEdit()
     m_searchEdit->installEventFilter(this);
 }
 
+void MainWindow::findNotesContain(const QString& keyword)
+{
+    m_proxyModel->setFilterFixedString(keyword);
+    m_clearButton->show();
+    if (m_proxyModel->rowCount() > 0) {
+        selectFirstNote();
+    } else {
+        m_currentSelectedNoteProxy = QModelIndex();
+    }
+}
+
+void MainWindow::selectFirstNote()
+{
+    if (m_proxyModel->rowCount() > 0) {
+        QModelIndex index = m_proxyModel->index(0, 0);
+        m_noteView->selectionModel()->select(index, QItemSelectionModel::ClearAndSelect);
+        m_noteView->setCurrentIndex(index);
+
+        m_currentSelectedNoteProxy = index;
+        showSticky(index);
+    }
+}
+
+void MainWindow::highlightSearch() const
+{
+    QString searchString = m_searchEdit->text();
+
+    if (searchString.isEmpty())
+        return;
+}
+
 void MainWindow::saveNoteToDB(const QModelIndex& noteIndex)
 {
     if (noteIndex.isValid()) {
@@ -315,6 +367,156 @@ void MainWindow::deleteNote(NoteData* noteData)
         m_noteModel->removeNote(indexToBeRemoved);
         emit requestDeleteNote(noteData);
     }
+}
+
+void MainWindow::deleteNote(const QModelIndex& noteIndex, bool isFromUser)
+{
+
+    if (noteIndex.isValid()) {
+        // delete from model
+        QModelIndex indexToBeRemoved = m_proxyModel->mapToSource(m_currentSelectedNoteProxy);
+        NoteData* noteTobeRemoved = m_noteModel->removeNote(indexToBeRemoved);
+
+        noteTobeRemoved->setDeletionDateTime(QDateTime::currentDateTime());
+        emit requestDeleteNote(noteTobeRemoved);
+
+        if (isFromUser) {
+
+            if (m_noteModel->rowCount() > 0) {
+                QModelIndex index = m_noteView->currentIndex();
+                m_currentSelectedNoteProxy = index;
+            } else {
+                m_currentSelectedNoteProxy = QModelIndex();
+            }
+        }
+    } else {
+        qDebug() << "MainWindow::deleteNote noteIndex is not valid";
+    }
+
+    m_noteView->setFocus();
+}
+
+void MainWindow::onSearchEditTextChanged(const QString& keyword)
+{
+    m_searchQueue.enqueue(keyword);
+    // disable animation while searching
+    m_noteView->setAnimationEnabled(false);
+    while (!m_searchQueue.isEmpty()) {
+        qApp->processEvents();
+        QString str = m_searchQueue.dequeue();
+        if (str.isEmpty()) {
+            clearSearch();
+            QModelIndex indexInProxy = m_proxyModel->mapFromSource(m_selectedNoteBeforeSearchingInSource);
+            selectNote(indexInProxy);
+            m_selectedNoteBeforeSearchingInSource = QModelIndex();
+        } else {
+            m_noteView->setFocusPolicy(Qt::NoFocus);
+            findNotesContain(str);
+        }
+    }
+    highlightSearch();
+}
+
+void MainWindow::onSearchEditReturnPressed()
+{
+    if (m_searchEdit->text().isEmpty())
+        return;
+}
+
+void MainWindow::onClearButtonClicked()
+{
+    clearSearch();
+
+    if (m_noteModel->rowCount() > 0) {
+        QModelIndex indexInProxy = m_proxyModel->mapFromSource(m_selectedNoteBeforeSearchingInSource);
+        int row = m_selectedNoteBeforeSearchingInSource.row();
+        if (row == m_noteModel->rowCount())
+            indexInProxy = m_proxyModel->index(m_proxyModel->rowCount() - 1, 0);
+
+        selectNote(indexInProxy);
+    } else {
+        m_currentSelectedNoteProxy = QModelIndex();
+    }
+
+    m_selectedNoteBeforeSearchingInSource = QModelIndex();
+}
+
+void MainWindow::clearSearch()
+{
+    m_searchEdit->blockSignals(true);
+    m_searchEdit->clear();
+    m_searchEdit->blockSignals(false);
+    m_proxyModel->setFilterFixedString(QString());
+
+    m_clearButton->hide();
+    m_searchEdit->setFocus();
+}
+
+void MainWindow::selectNoteDown()
+{
+    if (m_currentSelectedNoteProxy.isValid()) {
+        int currentRow = m_noteView->currentIndex().row();
+        QModelIndex belowIndex = m_noteView->model()->index(currentRow + 1, 0);
+        if (belowIndex.isValid()) {
+            m_noteView->setCurrentIndex(belowIndex);
+            m_noteView->setCurrentRowActive(false);
+            m_currentSelectedNoteProxy = belowIndex;
+            showSticky(m_currentSelectedNoteProxy);
+        }
+        //if the searchEdit is not empty, set the focus to it
+        if (!m_searchEdit->text().isEmpty()) {
+            m_searchEdit->setFocus();
+        } else {
+            m_noteView->setFocus();
+        }
+    }
+}
+
+void MainWindow::selectNoteUp()
+{
+    if (m_currentSelectedNoteProxy.isValid()) {
+        int currentRow = m_noteView->currentIndex().row();
+        QModelIndex aboveIndex = m_noteView->model()->index(currentRow - 1, 0);
+        if (aboveIndex.isValid()) {
+            m_noteView->setCurrentIndex(aboveIndex);
+            m_noteView->setCurrentRowActive(false);
+            m_currentSelectedNoteProxy = aboveIndex;
+            showSticky(m_currentSelectedNoteProxy);
+        }
+        if (!m_searchEdit->text().isEmpty()) {
+            m_searchEdit->setFocus();
+        } else {
+            m_noteView->setFocus();
+        }
+    }
+}
+
+void MainWindow::deleteSelectedNote()
+{
+    if (m_currentSelectedNoteProxy.isValid()) {
+
+        // update the index of the selected note before searching
+        if (!m_searchEdit->text().isEmpty()) {
+            QModelIndex currentIndexInSource = m_proxyModel->mapToSource(m_currentSelectedNoteProxy);
+            int beforeSearchSelectedRow = m_selectedNoteBeforeSearchingInSource.row();
+            if (currentIndexInSource.row() < beforeSearchSelectedRow) {
+                m_selectedNoteBeforeSearchingInSource = m_noteModel->index(beforeSearchSelectedRow - 1);
+            }
+        }
+
+        deleteNote(m_currentSelectedNoteProxy, true);
+        showSticky(m_currentSelectedNoteProxy);
+    }
+}
+
+void MainWindow::onNewNoteButtonClicked()
+{
+    if (!m_searchEdit->text().isEmpty()) {
+        clearSearch();
+        m_selectedNoteBeforeSearchingInSource = QModelIndex();
+    }
+
+    this->createNewNote();
 }
 
 void MainWindow::createNewNote()
@@ -357,13 +559,12 @@ void MainWindow::onNotePressed(const QModelIndex& index)
 
 void MainWindow::selectNote(const QModelIndex& noteIndex)
 {
-
     // show the content of the pressed note in the text editor
     showSticky(noteIndex);
 
-    //    m_noteView->selectionModel()->select(m_currentSelectedNoteProxy, QItemSelectionModel::ClearAndSelect);
-    //    m_noteView->setCurrentIndex(m_currentSelectedNoteProxy);
-    //    m_noteView->scrollTo(m_currentSelectedNoteProxy);
+    m_noteView->selectionModel()->select(m_currentSelectedNoteProxy, QItemSelectionModel::ClearAndSelect);
+    m_noteView->setCurrentIndex(m_currentSelectedNoteProxy);
+    m_noteView->scrollTo(m_currentSelectedNoteProxy);
 }
 
 void MainWindow::closeEvent(QCloseEvent* event)

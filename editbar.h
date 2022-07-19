@@ -20,6 +20,7 @@ private:
     BaseButton* italicButton;
     BaseButton* underlineButton;
     BaseButton* strikeButton;
+    BaseButton* listButton;
     BaseButton* embedImageButton;
 
 signals:
@@ -27,6 +28,7 @@ signals:
     void italicBtnClickedSignal(bool checked);
     void underlineBtnClickedSignal(bool checked);
     void strikeBtnClickedSignal(bool checked);
+    void listBtnClickedSignal(bool checked);
     void embedImageBtnClickedSignal(bool checked);
 };
 

@@ -100,6 +100,7 @@ void StickyWindow::initEditbar()
     connect(editbar, SIGNAL(italicBtnClickedSignal(bool)), this, SLOT(onItalicBtnClicked(bool)));
     connect(editbar, SIGNAL(underlineBtnClickedSignal(bool)), this, SLOT(onUnderlineBtnClicked(bool)));
     connect(editbar, SIGNAL(strikeBtnClickedSignal(bool)), this, SLOT(onStrikeBtnClicked(bool)));
+    connect(editbar, SIGNAL(listBtnClickedSignal(bool)), this, SLOT(onListBtnClicked(bool)));
     connect(editbar, SIGNAL(embedImageBtnClickedSignal(bool)), this, SLOT(onEmbedImageBtnClicked(bool)));
 }
 
@@ -147,8 +148,10 @@ void StickyWindow::onStyleBtnClicked(QString btnName)
     this->editbar->setVisible(true);
     this->titlebar->setVisible(true);
     this->textEdit->setFocus();
-    _noteData->setColor(btnName);
-    emit saveNote(_noteData);
+    if (_noteData) {
+        _noteData->setColor(btnName);
+        emit saveNote(_noteData);
+    }
 }
 
 void StickyWindow::mergeFormatOnWordOrSelection(const QTextCharFormat& format)
@@ -275,6 +278,21 @@ void StickyWindow::onStrikeBtnClicked(bool checked)
     mergeFormatOnWordOrSelection(fmt);
 }
 
+void StickyWindow::onListBtnClicked(bool checked)
+{
+    QTextCursor cur = textEdit->textCursor();
+    if (checked) {
+        QTextListFormat listFormat;
+        listFormat.setStyle(QTextListFormat::ListDisc);
+        cur.createList(listFormat);
+    } else {
+        cur.setBlockFormat(QTextBlockFormat());
+        //    cur.movePosition(QTextCursor::NextBlock);
+        //      cur.insertBlock(QTextBlockFormat());
+        textEdit->setTextCursor(cur);
+    }
+}
+
 void StickyWindow::onEmbedImageBtnClicked(bool checked)
 {
     QString imagePath = selectImage();
@@ -329,6 +347,8 @@ void StickyWindow::leaveEvent(QEvent* event)
 void StickyWindow::moveEvent(QMoveEvent* event)
 {
     QByteArray geometry = saveGeometry();
-    _noteData->setGeometry(geometry);
-    emit saveNote(_noteData);
+    if (_noteData) {
+        _noteData->setGeometry(geometry);
+        emit saveNote(_noteData);
+    }
 }
