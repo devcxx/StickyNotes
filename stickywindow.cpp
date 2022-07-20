@@ -72,7 +72,6 @@ void StickyWindow::setNoteData(NoteData* noteData)
     if (_noteData != Q_NULLPTR) {
         textEdit->setHtml(_noteData->content());
         if (!_noteData->geometry().isEmpty()) {
-            qDebug() << _noteData->geometry();
             restoreGeometry(_noteData->geometry());
         }
         QString noteColor = "#e5b804";

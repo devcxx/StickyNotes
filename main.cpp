@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include <QApplication>
 #include <QTranslator>
+#include <QVersionNumber>
 
 int main(int argc, char* argv[])
 {
@@ -15,6 +16,9 @@ int main(int argc, char* argv[])
     if (translator2.load(":/translations/zh_CN")) {
         QCoreApplication::installTranslator(&translator2);
     }
+
+    QVersionNumber appVersion(1, 0, 0);
+    QCoreApplication::setApplicationVersion(appVersion.toString());
 
     MainWindow mw;
     mw.show();

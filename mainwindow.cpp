@@ -6,6 +6,7 @@
 #include <QDesktopWidget>
 #include <QDir>
 #include <QFileInfo>
+#include <QLabel>
 #include <QLineEdit>
 #include <QMenu>
 #include <QPushButton>
@@ -132,6 +133,14 @@ void MainWindow::initUI()
 
     verticalLayout_scrollArea->addWidget(listView);
 
+    QHBoxLayout* horizontalLayout_version = new QHBoxLayout();
+    QLabel* versionLabel = new QLabel(this);
+    versionLabel->setText("v" + QCoreApplication::applicationVersion());
+    versionLabel->setStyleSheet("color: gray;font-family: Microsoft Yahei;font-size: 12px;");
+    horizontalLayout_version->addWidget(versionLabel);
+    horizontalLayout_version->addStretch();
+    verticalLayout_scrollArea->addLayout(horizontalLayout_version);
+
     centralWidget->setLayout(verticalLayout_scrollArea);
     setCentralWidget(centralWidget);
 }
@@ -211,9 +220,6 @@ void MainWindow::setupSignalsSlots()
         if (m_proxyModel->rowCount() > 1) {
             QModelIndex indexInProxy = m_proxyModel->index(1, 0);
             selectNote(indexInProxy);
-        } else if (m_proxyModel->rowCount() == 1) {
-            QModelIndex indexInProxy = m_proxyModel->index(0, 0);
-            deleteNote(indexInProxy, false);
         }
     });
     // note model rows moved
