@@ -12,6 +12,7 @@
 #include <QQueue>
 #include <QSettings>
 #include <QSortFilterProxyModel>
+#include <QSystemTrayIcon>
 #include <QThread>
 #include <QToolButton>
 #include <QWidget>
@@ -27,6 +28,7 @@ private:
     void setupModelView();
     void setupSignalsSlots();
     void setupShortcuts();
+    void setupTrayIcon();
     void initializeSettingsDatabase();
     void restoreStates();
     NoteData* generateNote(const int noteID);
@@ -55,6 +57,10 @@ private:
 
     QHash<int, StickyWindow*> m_stickys;
     QQueue<QString> m_searchQueue;
+
+    QSystemTrayIcon* m_trayIcon;
+    QMenu* m_trayIconMenu;
+    QAction* m_quitAction;
 
 private slots:
     void createNewNote();

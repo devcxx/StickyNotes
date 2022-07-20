@@ -23,7 +23,9 @@ MainWindow::MainWindow(QWidget* parent)
     , m_noteCounter(0)
     , m_dbManager(Q_NULLPTR)
     , m_dbThread(Q_NULLPTR)
-
+    , m_trayIcon(new QSystemTrayIcon(this))
+    , m_trayIconMenu(new QMenu(this))
+    , m_quitAction(new QAction(tr("&Quit"), this))
 {
     initUI();
     setupDatabases();
@@ -31,6 +33,7 @@ MainWindow::MainWindow(QWidget* parent)
     setupSearchEdit();
     setupSignalsSlots();
     setupShortcuts();
+    setupTrayIcon();
     restoreStates();
     QTimer::singleShot(200, this, SLOT(InitData()));
 }
@@ -235,6 +238,19 @@ void MainWindow::setupShortcuts()
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_E), m_searchEdit, SLOT(clear()));
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Down), this, SLOT(selectNoteDown()));
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Up), this, SLOT(selectNoteUp()));
+}
+
+void MainWindow::setupTrayIcon()
+{
+    // Quit Action
+    connect(m_quitAction, &QAction::triggered, qApp, &QApplication::quit);
+    m_trayIconMenu->addAction(m_quitAction);
+
+    QIcon icon(QStringLiteral(":/Icons/magnifyingGlass.png"));
+    m_trayIcon->setToolTip(QCoreApplication::applicationName());
+    m_trayIcon->setIcon(icon);
+    m_trayIcon->setContextMenu(m_trayIconMenu);
+    m_trayIcon->show();
 }
 
 void MainWindow::initializeSettingsDatabase()
