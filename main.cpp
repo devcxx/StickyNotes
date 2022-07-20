@@ -17,6 +17,8 @@ int main(int argc, char* argv[])
         QCoreApplication::installTranslator(&translator2);
     }
 
+    QCoreApplication::setApplicationName(QCoreApplication::translate("main", "StickyNotes"));
+
     QVersionNumber appVersion(1, 0, 0);
     QCoreApplication::setApplicationVersion(appVersion.toString());
 

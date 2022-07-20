@@ -37,22 +37,27 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../mainwindow.cpp" line="104"/>
+        <location filename="../mainwindow.cpp" line="28"/>
+        <source>&amp;Quit</source>
+        <translation type="unfinished">退出</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="108"/>
         <source>Create New Note</source>
         <translation type="unfinished">新建便签</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="308"/>
+        <location filename="../mainwindow.cpp" line="333"/>
         <source>Search</source>
         <translation type="unfinished">搜索</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="547"/>
+        <location filename="../mainwindow.cpp" line="572"/>
         <source>Show Note</source>
         <translation type="unfinished">显示便签</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="548"/>
+        <location filename="../mainwindow.cpp" line="573"/>
         <source>Delete Note</source>
         <translation type="unfinished">删除便签</translation>
     </message>
@@ -60,12 +65,12 @@
 <context>
     <name>StickyWindow</name>
     <message>
-        <location filename="../stickywindow.cpp" line="233"/>
+        <location filename="../stickywindow.cpp" line="232"/>
         <source>Open Image...</source>
         <translation type="unfinished">打开图片</translation>
     </message>
     <message>
-        <location filename="../stickywindow.cpp" line="235"/>
+        <location filename="../stickywindow.cpp" line="234"/>
         <source>Image Files (*.svg *.png *.jpg *.jpeg *.bmp *.gif);;All Files (*)</source>
         <translation type="unfinished">图片文件 (*.svg *.png *.jpg *.jpeg *.bmp *.gif);;所有文件 (*)</translation>
     </message>
@@ -129,6 +134,14 @@
         <location filename="../titlebar.cpp" line="26"/>
         <source>Close</source>
         <translation type="unfinished">关闭</translation>
+    </message>
+</context>
+<context>
+    <name>main</name>
+    <message>
+        <location filename="../main.cpp" line="20"/>
+        <source>StickyNotes</source>
+        <translation type="unfinished">便签</translation>
     </message>
 </context>
 </TS>
