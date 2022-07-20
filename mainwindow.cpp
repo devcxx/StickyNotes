@@ -246,7 +246,7 @@ void MainWindow::setupTrayIcon()
     connect(m_quitAction, &QAction::triggered, qApp, &QApplication::quit);
     m_trayIconMenu->addAction(m_quitAction);
 
-    QIcon icon(QStringLiteral(":/Icons/magnifyingGlass.png"));
+    QIcon icon(QStringLiteral(":/Icons/StickyNote.png"));
     m_trayIcon->setToolTip(QCoreApplication::applicationName());
     m_trayIcon->setIcon(icon);
     m_trayIcon->setContextMenu(m_trayIconMenu);

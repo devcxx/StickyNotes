@@ -25,6 +25,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 Release:DESTDIR = $$PWD/../bin
 Debug:DESTDIR = $$PWD/../bin_debug
 
+RC_FILE = StickyNotes.rc
+
 TRANSLATIONS += \
     $$PWD/translations/zh_CN.ts \
     $$PWD/translations/qt_zh_CN.ts \

@@ -17,5 +17,6 @@
         <file>Icons/list.png</file>
         <file>translations/zh_CN.qm</file>
         <file>translations/qt_zh_CN.qm</file>
+        <file>Icons/StickyNote.png</file>
     </qresource>
 </RCC>
