@@ -42,22 +42,27 @@
         <translation type="unfinished">退出</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="108"/>
+        <location filename="../mainwindow.cpp" line="29"/>
+        <source>Sticky List</source>
+        <translation type="unfinished">便签列表</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="109"/>
         <source>Create New Note</source>
         <translation type="unfinished">新建便签</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="333"/>
+        <location filename="../mainwindow.cpp" line="348"/>
         <source>Search</source>
         <translation type="unfinished">搜索</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="572"/>
+        <location filename="../mainwindow.cpp" line="587"/>
         <source>Show Note</source>
         <translation type="unfinished">显示便签</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="573"/>
+        <location filename="../mainwindow.cpp" line="588"/>
         <source>Delete Note</source>
         <translation type="unfinished">删除便签</translation>
     </message>

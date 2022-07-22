@@ -61,7 +61,7 @@ private:
     QSystemTrayIcon* m_trayIcon;
     QMenu* m_trayIconMenu;
     QAction* m_quitAction;
-
+    QAction* m_showAction;
 private slots:
     void createNewNote();
     void InitData();

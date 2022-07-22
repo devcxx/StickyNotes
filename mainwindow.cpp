@@ -26,6 +26,7 @@ MainWindow::MainWindow(QWidget* parent)
     , m_trayIcon(new QSystemTrayIcon(this))
     , m_trayIconMenu(new QMenu(this))
     , m_quitAction(new QAction(tr("&Quit"), this))
+    , m_showAction(new QAction(tr("Sticky List"), this))
 {
     initUI();
     setupDatabases();
@@ -256,6 +257,8 @@ void MainWindow::setupTrayIcon()
 {
     // Quit Action
     connect(m_quitAction, &QAction::triggered, qApp, &QApplication::quit);
+    connect(m_showAction, &QAction::triggered, this, &MainWindow::show);
+    m_trayIconMenu->addAction(m_showAction);
     m_trayIconMenu->addAction(m_quitAction);
 
     QIcon icon(QStringLiteral(":/Icons/StickyNote.png"));
