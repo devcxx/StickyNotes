@@ -131,6 +131,18 @@ void MainWindow::initUI()
     listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     listView->setProperty("showDropIndicator", QVariant(false));
     listView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    QScrollBar* scrollBar = new QScrollBar;
+    scrollBar->setStyleSheet("QScrollBar:vertical {width: 6px;background: transparent;margin:0px 0px 0px 0px;}"
+                             "QScrollBar::handle:vertical {width: 6px;min-height: 45px;background: #292929;margin-left: 0px;margin-right: 0px;}"
+                             "QScrollBar::handle:vertical:hover {background: #3e3e3e;}"
+                             "QScrollBar::handle:vertical:pressed {background: #272727;}"
+                             "QScrollBar::sub-line:vertical {height: 6px;background: transparent;subcontrol-position: top;}"
+                             "QScrollBar::add-line:vertical {height: 6px;background: transparent;subcontrol-position: bottom;}"
+                             "QScrollBar::sub-line:vertical:hover {background: #292929;}"
+                             "QScrollBar::add-line:vertical:hover {background: #292929;}"
+                             "QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {background: transparent;}");
+
+    listView->setVerticalScrollBar(scrollBar);
 
     m_noteView = listView;
 
