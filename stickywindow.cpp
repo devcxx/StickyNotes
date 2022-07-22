@@ -203,10 +203,10 @@ void StickyWindow::imageEmbed(const QString& path)
     //    }
     //    TextEdit *textEdit = qobject_cast<TextEdit*>(ui->stackedWidget->currentWidget());
     //QString ("<img src=\"data:image/png;base64,%1\">")
-    textEdit->insertHtml(QString("<img src=\"data:image;base64,%1\" width=\"%2\" height=\"%3\" />")
-                             .arg(QString(base64array))
-                             .arg(w)
-                             .arg(h));
+    textEdit->insertHtml(QString("<img src=\"data:image;base64,%1\" width=\"100%\" height=\"100%\" />")
+                             .arg(QString(base64array)));
+    //                             .arg(w)
+    //                             .arg(h));
 
     raise();
 }

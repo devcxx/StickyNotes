@@ -17,31 +17,41 @@
 
 #include "vscrollbar.h"
 
-VScrollBar::VScrollBar (QWidget *parent) : QScrollBar (parent) {}
+VScrollBar::VScrollBar(QWidget* parent)
+    : QScrollBar(parent)
+{
+    setStyleSheet("QScrollBar:vertical {width: 6px;background: transparent;margin:0px 0px 0px 0px;}"
+                  "QScrollBar::handle:vertical {width: 6px;min-height: 45px;background: #292929;margin-left: 0px;margin-right: 0px;}"
+                  "QScrollBar::handle:vertical:hover {background: #3e3e3e;}"
+                  "QScrollBar::handle:vertical:pressed {background: #272727;}"
+                  "QScrollBar::sub-line:vertical {height: 6px;background: transparent;subcontrol-position: top;}"
+                  "QScrollBar::add-line:vertical {height: 6px;background: transparent;subcontrol-position: bottom;}"
+                  "QScrollBar::sub-line:vertical:hover {background: #292929;}"
+                  "QScrollBar::add-line:vertical:hover {background: #292929;}"
+                  "QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {background: transparent;}");
+}
 /*************************/
-void VScrollBar::wheelEvent (QWheelEvent *event)
+void VScrollBar::wheelEvent(QWheelEvent* event)
 {
     if (!underMouse()
         || !event->spontaneous()
         || event->source() != Qt::MouseEventNotSynthesized
         /* Apparently, Qt's hover bug is never going to be fixed! */
-        || !rect().contains (mapFromGlobal (QCursor::pos())))
-    {
-        QScrollBar::wheelEvent (event);
+        || !rect().contains(mapFromGlobal(QCursor::pos()))) {
+        QScrollBar::wheelEvent(event);
         return;
     }
     QPoint anglePoint = event->angleDelta();
-    int delta = qAbs (anglePoint.x()) > qAbs (anglePoint.y()) ? anglePoint.x()
-                                                              : anglePoint.y();
+    int delta = qAbs(anglePoint.x()) > qAbs(anglePoint.y()) ? anglePoint.x()
+                                                            : anglePoint.y();
 
     /* wait until the angle delta reaches that of an ordinary mouse wheel */
     static int _effectiveDelta = 0;
     _effectiveDelta += delta;
-    if (qAbs (_effectiveDelta) < 120)
+    if (qAbs(_effectiveDelta) < 120)
         return;
 
-    int step = (_effectiveDelta < 0 ? 1 : -1) * qMax (pageStep() / ((event->modifiers() & Qt::ShiftModifier) ? 2 : 1), 1);
+    int step = (_effectiveDelta < 0 ? 1 : -1) * qMax(pageStep() / ((event->modifiers() & Qt::ShiftModifier) ? 2 : 1), 1);
     _effectiveDelta = 0;
-    setSliderPosition (sliderPosition() + step);
+    setSliderPosition(sliderPosition() + step);
 }
-
