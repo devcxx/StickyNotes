@@ -21,13 +21,13 @@ StyleOptionBar::StyleOptionBar(QWidget* parent)
     greenStyle_btn->setObjectName("#65ba5a");
     greenStyle_btn->setToolTip(tr("Green"));
     pinkStyle_btn->setObjectName("#ea86c2");
-    pinkStyle_btn->setObjectName(tr("Pink"));
+    pinkStyle_btn->setToolTip(tr("Pink"));
     grayStyle_btn->setObjectName("#989898");
     grayStyle_btn->setToolTip(tr("Gray"));
     charcoalStyle_btn->setObjectName("#444444");
     charcoalStyle_btn->setToolTip(tr("Charcoal"));
 
-    QString style = QString("QPushButton{background: %1;width:30px;height:20px;border:none;}"
+    QString style = QString("QPushButton{background: %1;width:30px;height:22px;border:1px dashed black;}"
                             "QPushButton:hover:pressed:{none}");
 
     purpleStyle_btn->setStyleSheet(style.arg("#b07fe0"));

@@ -330,6 +330,7 @@ void StickyWindow::onTextEditTextChanged()
 
 void StickyWindow::enterEvent(QEvent* event)
 {
+    this->titlebar->setVisible(true);
     this->titlebar->setBtnsVisible(true);
     this->editbar->setVisible(true);
     this->textEdit->setFocus();
