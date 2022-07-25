@@ -308,7 +308,7 @@ void StickyWindow::onEmbedImageBtnClicked(bool checked)
 QString StickyWindow::getFirstLine(const QString& str)
 {
     if (str.simplified().isEmpty())
-        return "New Note";
+        return tr("New Note");
 
     QString text = str.trimmed();
     QTextStream ts(&text);

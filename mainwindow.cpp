@@ -294,7 +294,7 @@ NoteData* MainWindow::generateNote(const int noteID)
     QDateTime noteDate = QDateTime::currentDateTime();
     newNote->setCreationDateTime(noteDate);
     newNote->setLastModificationDateTime(noteDate);
-    newNote->setFullTitle(QStringLiteral("New Note"));
+    newNote->setFullTitle(tr("New Note"));
 
     return newNote;
 }

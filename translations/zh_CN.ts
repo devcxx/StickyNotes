@@ -52,6 +52,11 @@
         <translation type="unfinished">新建便签</translation>
     </message>
     <message>
+        <location filename="../mainwindow.cpp" line="297"/>
+        <source>New Note</source>
+        <translation type="unfinished">新便签</translation>
+    </message>
+    <message>
         <location filename="../mainwindow.cpp" line="348"/>
         <source>Search</source>
         <translation type="unfinished">搜索</translation>
@@ -78,6 +83,11 @@
         <location filename="../stickywindow.cpp" line="234"/>
         <source>Image Files (*.svg *.png *.jpg *.jpeg *.bmp *.gif);;All Files (*)</source>
         <translation type="unfinished">图片文件 (*.svg *.png *.jpg *.jpeg *.bmp *.gif);;所有文件 (*)</translation>
+    </message>
+    <message>
+        <location filename="../stickywindow.cpp" line="311"/>
+        <source>New Note</source>
+        <translation type="unfinished">新便签</translation>
     </message>
 </context>
 <context>
