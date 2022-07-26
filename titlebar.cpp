@@ -43,8 +43,8 @@ void TitleBar::initControl()
     titlebar_layout->addWidget(setting_btn);
     titlebar_layout->addStretch();
     titlebar_layout->addWidget(delete_btn);
-    titlebar_layout->addStretch();
-    titlebar_layout->addSpacing(40);
+    //    titlebar_layout->addStretch();
+    //    titlebar_layout->addSpacing(40);
     titlebar_layout->addWidget(close_btn);
 
     titlebar_layout->setContentsMargins(6, 4, 6, 0);
