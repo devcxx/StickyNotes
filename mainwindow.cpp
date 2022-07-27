@@ -432,6 +432,13 @@ void MainWindow::deleteNote(NoteData* noteData)
 
 void MainWindow::deleteNote(const QModelIndex& noteIndex, bool isFromUser)
 {
+    int noteID = noteIndex.data(NoteModel::NoteID).toInt();
+    if (m_stickys.contains(noteID)) {
+        StickyWindow* stickyWnd = m_stickys[noteID];
+        stickyWnd->close();
+        delete stickyWnd;
+        m_stickys.remove(noteID);
+    }
 
     if (noteIndex.isValid()) {
         // delete from model
