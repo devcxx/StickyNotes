@@ -136,8 +136,11 @@ void StickyWindow::onDeleteBtnClicked()
 void StickyWindow::onCloseBtnClicked()
 {
     //    this->close();
-
     hide();
+    if (_noteData) {
+        _noteData->setVisable(false);
+        emit saveNote(_noteData);
+    }
 }
 
 void StickyWindow::onStyleBtnClicked(QString btnName)
@@ -313,6 +316,15 @@ QString StickyWindow::getFirstLine(const QString& str)
     QString text = str.trimmed();
     QTextStream ts(&text);
     return ts.readLine(FIRST_LINE_MAX);
+}
+
+void StickyWindow::show()
+{
+    QMainWindow::show();
+    if (_noteData) {
+        _noteData->setVisable(true);
+        emit saveNote(_noteData);
+    }
 }
 
 void StickyWindow::onTextEditTextChanged()

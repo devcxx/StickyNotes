@@ -643,6 +643,26 @@ void MainWindow::loadNotes(QList<NoteData*> noteList, int noteCounter)
         m_noteModel->sort(0, Qt::AscendingOrder);
     }
     m_noteCounter = noteCounter;
+
+    foreach (NoteData* note, noteList) {
+        if (note->visable()) {
+            int noteID = note->id();
+            if (m_stickys.contains(noteID)) {
+                StickyWindow* stickyWnd = m_stickys[noteID];
+                stickyWnd->show();
+                stickyWnd->raise();
+            } else {
+                StickyWindow* stickyWnd = new StickyWindow(note);
+                connect(stickyWnd, SIGNAL(saveNote(NoteData*)), this, SLOT(saveNoteToDB(NoteData*)));
+                connect(stickyWnd, SIGNAL(deleteNote(NoteData*)), this, SLOT(deleteNote(NoteData*)));
+                connect(stickyWnd, SIGNAL(createNewNote()), this, SLOT(createNewNote()));
+                m_stickys[noteID]
+                    = stickyWnd;
+                stickyWnd->show();
+                stickyWnd->raise();
+            }
+        }
+    }
 }
 
 void MainWindow::onNotePressed(const QModelIndex& index)

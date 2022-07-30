@@ -45,6 +45,9 @@ public:
     QString color() const;
     void setColor(const QString& color);
 
+    bool visable() const;
+    void setVisable(bool visable);
+
 private:
     int m_id;
     QString m_fullTitle;
@@ -57,6 +60,7 @@ private:
     int m_scrollBarPosition;
     QByteArray m_geometry;
     QString m_color;
+    bool m_visable;
 };
 
 QDataStream& operator<<(QDataStream& stream, const NoteData* noteData);

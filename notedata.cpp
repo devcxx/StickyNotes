@@ -6,6 +6,7 @@ NoteData::NoteData(QObject* parent)
     , m_isModified(false)
     , m_isSelected(false)
     , m_scrollBarPosition(0)
+    , m_visable(true)
 {
 }
 
@@ -109,6 +110,16 @@ void NoteData::setColor(const QString& color)
     m_color = color;
 }
 
+bool NoteData::visable() const
+{
+    return m_visable;
+}
+
+void NoteData::setVisable(bool visable)
+{
+    m_visable = visable;
+}
+
 QDateTime NoteData::creationDateTime() const
 {
     return m_creationDateTime;
@@ -123,7 +134,7 @@ QDataStream& operator<<(QDataStream& stream, const NoteData* noteData)
 {
     return stream << noteData->id() << noteData->fullTitle() << noteData->creationDateTime()
                   << noteData->lastModificationdateTime() << noteData->content() << noteData->geometry()
-                  << noteData->color();
+                  << noteData->color() << (noteData->visable() ? 1 : 0);
 }
 
 QDataStream& operator>>(QDataStream& stream, NoteData*& noteData)
@@ -136,7 +147,9 @@ QDataStream& operator>>(QDataStream& stream, NoteData*& noteData)
     QString content;
     QByteArray geometry;
     QString color;
-    stream >> id >> fullTitle >> creationDateTime >> lastModificationDateTime >> content >> geometry >> color;
+    int visable;
+
+    stream >> id >> fullTitle >> creationDateTime >> lastModificationDateTime >> content >> geometry >> color >> visable;
     noteData->setId(id);
     noteData->setFullTitle(fullTitle);
     noteData->setLastModificationDateTime(lastModificationDateTime);
@@ -144,5 +157,6 @@ QDataStream& operator>>(QDataStream& stream, NoteData*& noteData)
     noteData->setContent(content);
     noteData->setGeometry(geometry);
     noteData->setColor(color);
+    noteData->setVisable(visable == 1);
     return stream;
 }

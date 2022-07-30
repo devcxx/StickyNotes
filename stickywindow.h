@@ -43,6 +43,9 @@ private:
     QString selectImage();
     QString getFirstLine(const QString& str);
 
+public slots:
+    void show();
+
 private slots:
     void onNewBtnClicked();
     void onSettingBtnClicked();

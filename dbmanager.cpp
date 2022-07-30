@@ -51,7 +51,8 @@ void DBManager::createTables()
                      "content TEXT, "
                      "full_title TEXT, "
                      "geometry BLOB, "
-                     "color TEXT);";
+                     "color TEXT,"
+                     "visable INTEGER NOT NULL DEFAULT (1));";
 
     query.exec(active);
 
@@ -66,7 +67,8 @@ void DBManager::createTables()
                       "content TEXT,"
                       "full_title TEXT,"
                       "geometry BLOB,"
-                      "color TEXT)";
+                      "color TEXT,"
+                      "visable INTEGER NOT NULL DEFAULT (1))";
     query.exec(deleted);
 }
 
@@ -122,6 +124,7 @@ NoteData* DBManager::getNote(QString id)
         QString fullTitle = query.value(5).toString();
         QByteArray geometry = query.value(6).toByteArray();
         QString color = query.value(7).toString();
+        bool visable = query.value(8).toInt() == 1;
 
         note->setId(id);
         note->setCreationDateTime(dateTimeCreation);
@@ -130,6 +133,8 @@ NoteData* DBManager::getNote(QString id)
         note->setFullTitle(fullTitle);
         note->setGeometry(geometry);
         note->setColor(color);
+        note->setVisable(visable);
+
         return note;
     }
     return Q_NULLPTR;
@@ -176,6 +181,7 @@ QList<NoteData*> DBManager::getAllNotes()
             QString fullTitle = query.value(5).toString();
             QByteArray geometry = query.value(6).toByteArray();
             QString color = query.value(7).toString();
+            bool visable = query.value(8).toInt() == 1;
 
             note->setId(id);
             note->setCreationDateTime(dateTimeCreation);
@@ -184,6 +190,7 @@ QList<NoteData*> DBManager::getAllNotes()
             note->setFullTitle(fullTitle);
             note->setGeometry(geometry);
             note->setColor(color);
+            note->setVisable(visable);
 
             noteList.push_back(note);
         }
@@ -216,16 +223,17 @@ bool DBManager::addNote(NoteData* note)
 
     qint64 epochTimeDateLastModified = note->lastModificationdateTime().isNull() ? epochTimeDateCreated
                                                                                  : note->lastModificationdateTime().toMSecsSinceEpoch();
+    bool visable = note->visable();
 
-    query.prepare("INSERT INTO active_notes (creation_date, modification_date, deletion_date, content, full_title, geometry, color)"
-                  "VALUES (:creation_date, :modification_date, -1, :content, :full_title, :geometry, :color);");
+    query.prepare("INSERT INTO active_notes (creation_date, modification_date, deletion_date, content, full_title, geometry, color, visable)"
+                  "VALUES (:creation_date, :modification_date, -1, :content, :full_title, :geometry, :color, :visable);");
     query.bindValue(":creation_date", epochTimeDateCreated);
     query.bindValue(":modification_date", epochTimeDateLastModified);
     query.bindValue(":content", content);
     query.bindValue(":full_title", fullTitle);
     query.bindValue(":geometry", geometry);
     query.bindValue(":color", color);
-
+    query.bindValue(":visable", visable ? 1 : 0);
     query.exec();
 
     return (query.numRowsAffected() == 1);
@@ -260,9 +268,10 @@ bool DBManager::removeNote(NoteData* note)
 
     QByteArray geometry = note->geometry();
     QString color = note->color();
+    bool visable = note->visable();
 
-    query.prepare("INSERT INTO deleted_notes (id, creation_date, modification_date, deletion_date, content, full_title, geometry, color)"
-                  "VALUES (:id, :creation_date, :modification_date, :deletion_date, :content, :full_title, :geometry, :color);");
+    query.prepare("INSERT INTO deleted_notes (id, creation_date, modification_date, deletion_date, content, full_title, geometry, color, visable)"
+                  "VALUES (:id, :creation_date, :modification_date, :deletion_date, :content, :full_title, :geometry, :color, :visable);");
     query.bindValue(":id", id);
     query.bindValue(":creation_date", epochTimeDateCreated);
     query.bindValue(":modification_date", epochTimeDateModified);
@@ -271,6 +280,7 @@ bool DBManager::removeNote(NoteData* note)
     query.bindValue(":full_title", fullTitle);
     query.bindValue(":geometry", geometry);
     query.bindValue(":color", color);
+    query.bindValue(":visable", visable ? 1 : 0);
 
     query.exec();
     bool addedToTrashDB = (query.numRowsAffected() == 1);
@@ -304,15 +314,17 @@ bool DBManager::updateNote(NoteData* note)
     QString fullTitle = note->fullTitle().replace(QChar('\x0'), emptyStr);
     QByteArray geometry = note->geometry();
     QString color = note->color();
+    bool visable = note->visable();
 
     query.prepare(QStringLiteral("UPDATE active_notes SET modification_date = :date, content = :content, "
-                                 "full_title = :title, geometry = :geometry, color = :color WHERE id = :id"));
+                                 "full_title = :title, geometry = :geometry, color = :color, visable = :visable WHERE id = :id"));
     query.bindValue(QStringLiteral(":date"), epochTimeDateModified);
     query.bindValue(QStringLiteral(":content"), content);
     query.bindValue(QStringLiteral(":title"), fullTitle);
     query.bindValue(QStringLiteral(":id"), id);
     query.bindValue(QStringLiteral(":geometry"), geometry);
     query.bindValue(QStringLiteral(":color"), color);
+    query.bindValue(QStringLiteral(":visable"), visable ? 1 : 0);
 
     if (!query.exec()) {
         qWarning() << __func__ << ": " << query.lastError();
@@ -343,8 +355,10 @@ bool DBManager::migrateNote(NoteData* note)
 
     QByteArray geometry = note->geometry();
     QString color = note->color();
-    query.prepare("INSERT INTO active_notes (id, creation_date, modification_date, deletion_date, content, full_title, geometry, color)"
-                  "VALUES (:id, :creation_date, :modification_date, -1, :content, :full_title, :geometry, :color);");
+    bool visable = note->visable();
+
+    query.prepare("INSERT INTO active_notes (id, creation_date, modification_date, deletion_date, content, full_title, geometry, color, visable)"
+                  "VALUES (:id, :creation_date, :modification_date, -1, :content, :full_title, :geometry, :color, :visable);");
     query.bindValue(":id", id);
     query.bindValue(":creation_date", epochTimeDateCreated);
     query.bindValue(":modification_date", epochTimeDateModified);
@@ -352,6 +366,7 @@ bool DBManager::migrateNote(NoteData* note)
     query.bindValue(":full_title", fullTitle);
     query.bindValue(":geometry", geometry);
     query.bindValue(":color", color);
+    query.bindValue(":visable", visable ? 1 : 0);
 
     query.exec();
     return (query.numRowsAffected() == 1);
@@ -379,9 +394,10 @@ bool DBManager::migrateTrash(NoteData* note)
                             .replace(QChar('\x0'), emptyStr);
     QByteArray geometry = note->geometry();
     QString color = note->color();
+    bool visable = note->visable();
 
-    query.prepare("INSERT INTO deleted_notes (id, creation_date, modification_date, deletion_date, content, full_title, geometry, color)"
-                  "VALUES (:id, :creation_date, :modification_date, :deletion_date, :content, :full_title, :geometry, :color);");
+    query.prepare("INSERT INTO deleted_notes (id, creation_date, modification_date, deletion_date, content, full_title, geometry, color, visable)"
+                  "VALUES (:id, :creation_date, :modification_date, :deletion_date, :content, :full_title, :geometry, :color, :visable);");
     query.bindValue(":id", id);
     query.bindValue(":creation_date", epochTimeDateCreated);
     query.bindValue(":modification_date", epochTimeDateModified);
@@ -390,6 +406,7 @@ bool DBManager::migrateTrash(NoteData* note)
     query.bindValue(":full_title", fullTitle);
     query.bindValue(":geometry", geometry);
     query.bindValue(":color", color);
+    query.bindValue(":visable", visable ? 1 : 0);
 
     query.exec();
     return (query.numRowsAffected() == 1);
