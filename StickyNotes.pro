@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui sql concurrent
+QT       += core gui sql concurrent network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -47,6 +47,7 @@ SOURCES += \
     notewidgetdelegate.cpp \
     notemodel.cpp \
     basebutton.cpp \
+    singleinstance.cpp \
 
 HEADERS += \
     editbar.h \
@@ -64,6 +65,7 @@ HEADERS += \
     notewidgetdelegate.h \
     notemodel.h \
     basebutton.h \
+    singleinstance.h \
 
 RESOURCES += \
     assets.qrc
