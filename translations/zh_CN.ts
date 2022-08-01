@@ -156,7 +156,7 @@
     <message>
         <location filename="../main.cpp" line="20"/>
         <source>StickyNotes</source>
-        <translation type="unfinished">便签</translation>
+        <translation type="unfinished">启星便签</translation>
     </message>
 </context>
 </TS>

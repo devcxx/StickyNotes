@@ -83,6 +83,7 @@ private slots:
     void showContextMenu(const QPoint& pos);
     void showSelectedSticky();
     void deleteSelectedSticky();
+    void onTrayActivated(QSystemTrayIcon::ActivationReason reason);
 
 protected:
     void closeEvent(QCloseEvent* event) Q_DECL_OVERRIDE;

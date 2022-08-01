@@ -265,6 +265,8 @@ void MainWindow::setupTrayIcon()
     m_trayIcon->setToolTip(QCoreApplication::applicationName());
     m_trayIcon->setIcon(icon);
     m_trayIcon->setContextMenu(m_trayIconMenu);
+    connect(m_trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(onTrayActivated(QSystemTrayIcon::ActivationReason)));
+
     m_trayIcon->show();
 }
 
@@ -692,4 +694,17 @@ void MainWindow::closeEvent(QCloseEvent* event)
 
     m_settingsDatabase->sync();
     QMainWindow::closeEvent(event);
+}
+
+void MainWindow::onTrayActivated(QSystemTrayIcon::ActivationReason reason)
+{
+
+    switch (reason) {
+    case QSystemTrayIcon::Trigger:
+    case QSystemTrayIcon::DoubleClick:
+        showNormal();
+        break;
+    default:
+        break;
+    }
 }
