@@ -702,7 +702,8 @@ void MainWindow::onTrayActivated(QSystemTrayIcon::ActivationReason reason)
     switch (reason) {
     case QSystemTrayIcon::Trigger:
     case QSystemTrayIcon::DoubleClick:
-        showNormal();
+        show();
+        raise();
         break;
     default:
         break;

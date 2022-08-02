@@ -279,7 +279,7 @@ QString NoteWidgetDelegate::parseDateTime(const QDateTime& dateTime) const
     if (dateTime.date() == currDateTime.date()) {
         return usLocale.toString(dateTime.time(), "h:mm A");
     } else if (dateTime.daysTo(currDateTime) == 1) {
-        return "Yesterday";
+        return tr("Yesterday");
     } else if (dateTime.daysTo(currDateTime) >= 2 && dateTime.daysTo(currDateTime) <= 7) {
         return usLocale.toString(dateTime.date(), "dddd");
     }

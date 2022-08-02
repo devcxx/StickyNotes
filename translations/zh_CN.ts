@@ -52,40 +52,48 @@
         <translation type="unfinished">新建便签</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="297"/>
+        <location filename="../mainwindow.cpp" line="299"/>
         <source>New Note</source>
         <translation type="unfinished">新便签</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="348"/>
+        <location filename="../mainwindow.cpp" line="350"/>
         <source>Search</source>
         <translation type="unfinished">搜索</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="587"/>
+        <location filename="../mainwindow.cpp" line="596"/>
         <source>Show Note</source>
         <translation type="unfinished">显示便签</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="588"/>
+        <location filename="../mainwindow.cpp" line="597"/>
         <source>Delete Note</source>
         <translation type="unfinished">删除便签</translation>
     </message>
 </context>
 <context>
+    <name>NoteWidgetDelegate</name>
+    <message>
+        <location filename="../notewidgetdelegate.cpp" line="282"/>
+        <source>Yesterday</source>
+        <translation type="unfinished">昨天</translation>
+    </message>
+</context>
+<context>
     <name>StickyWindow</name>
     <message>
-        <location filename="../stickywindow.cpp" line="232"/>
+        <location filename="../stickywindow.cpp" line="235"/>
         <source>Open Image...</source>
         <translation type="unfinished">打开图片</translation>
     </message>
     <message>
-        <location filename="../stickywindow.cpp" line="234"/>
+        <location filename="../stickywindow.cpp" line="237"/>
         <source>Image Files (*.svg *.png *.jpg *.jpeg *.bmp *.gif);;All Files (*)</source>
         <translation type="unfinished">图片文件 (*.svg *.png *.jpg *.jpeg *.bmp *.gif);;所有文件 (*)</translation>
     </message>
     <message>
-        <location filename="../stickywindow.cpp" line="311"/>
+        <location filename="../stickywindow.cpp" line="314"/>
         <source>New Note</source>
         <translation type="unfinished">新便签</translation>
     </message>
@@ -154,7 +162,7 @@
 <context>
     <name>main</name>
     <message>
-        <location filename="../main.cpp" line="20"/>
+        <location filename="../main.cpp" line="30"/>
         <source>StickyNotes</source>
         <translation type="unfinished">启星便签</translation>
     </message>
