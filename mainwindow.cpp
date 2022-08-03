@@ -402,9 +402,9 @@ void MainWindow::selectFirstNote()
 void MainWindow::highlightSearch() const
 {
     QString searchString = m_searchEdit->text();
-
-    if (searchString.isEmpty())
-        return;
+    foreach (StickyWindow* stickyWnd, m_stickys) {
+        stickyWnd->highlightSearch(searchString);
+    }
 }
 
 void MainWindow::saveNoteToDB(const QModelIndex& noteIndex)

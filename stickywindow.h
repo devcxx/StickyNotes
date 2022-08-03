@@ -22,6 +22,7 @@ public:
     explicit StickyWindow(NoteData* noteData, QWidget* parent = 0);
     ~StickyWindow();
     void setNoteData(NoteData* noteData);
+    void highlightSearch(const QString& searchString);
 
 private:
     TitleBar* titlebar;

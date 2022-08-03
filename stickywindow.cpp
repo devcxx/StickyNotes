@@ -340,6 +340,29 @@ void StickyWindow::onTextEditTextChanged()
     }
 }
 
+void StickyWindow::highlightSearch(const QString& searchString)
+{
+    if (searchString.isEmpty()) {
+        QList<QTextEdit::ExtraSelection> extraSelections; //empty list
+        textEdit->setExtraSelections(extraSelections);
+        return;
+    }
+
+    textEdit->moveCursor(QTextCursor::Start);
+
+    QList<QTextEdit::ExtraSelection> extraSelections;
+    QTextCharFormat highlightFormat;
+    highlightFormat.setBackground(Qt::yellow);
+
+    while (textEdit->find(searchString))
+        extraSelections.append({ textEdit->textCursor(), highlightFormat });
+
+    if (!extraSelections.isEmpty()) {
+        textEdit->setTextCursor(extraSelections.first().cursor);
+        textEdit->setExtraSelections(extraSelections);
+    }
+}
+
 void StickyWindow::enterEvent(QEvent* event)
 {
     this->titlebar->setVisible(true);
