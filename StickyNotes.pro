@@ -22,8 +22,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-Release:DESTDIR = $$PWD/../bin
-Debug:DESTDIR = $$PWD/../bin_debug
+Release:DESTDIR = $$PWD/bin
+Debug:DESTDIR = $$PWD/bin_debug
 
 RC_FILE = StickyNotes.rc
 
@@ -69,3 +69,7 @@ HEADERS += \
 
 RESOURCES += \
     assets.qrc
+
+win32 {
+    QMAKE_POST_LINK += $$quote($$[QT_INSTALL_BINS]/windeployqt --no-translations --no-system-d3d-compiler --no-compiler-runtime --no-opengl-sw  \"$${DESTDIR}/$${TARGET}.exe\"$$escape_expand(\\n\\t))
+}

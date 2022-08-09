@@ -517,7 +517,7 @@ void MainWindow::clearSearch()
     m_searchEdit->clear();
     m_searchEdit->blockSignals(false);
     m_proxyModel->setFilterFixedString(QString());
-
+    highlightSearch();
     m_clearButton->hide();
     m_searchEdit->setFocus();
 }
