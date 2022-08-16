@@ -258,6 +258,10 @@ void MainWindow::setupTrayIcon()
     // Quit Action
     connect(m_quitAction, &QAction::triggered, qApp, &QApplication::quit);
     connect(m_showAction, &QAction::triggered, this, &MainWindow::show);
+    m_trayIconMenu->setStyleSheet("QMenu{padding:5px;background:white;border:1px solid gray;}"
+                  "QMenu::item{padding:0px 40px 0px 30px;height:25px;}"
+                  "QMenu::item:selected:!enabled{background:transparent;}"
+                  "QMenu::item:selected:enabled{background:lightgray;color:white;}");
     m_trayIconMenu->addAction(m_showAction);
     m_trayIconMenu->addAction(m_quitAction);
 
